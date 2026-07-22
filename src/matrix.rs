@@ -2,9 +2,9 @@ use std::fmt;
 use std::ops::{Index, IndexMut};
 
 pub struct Matrix<K> {
+    data: Vec<K>,
     rows: usize,
     cols: usize,
-    data: Vec<K>,
 }
 
 impl<K> Matrix<K> {
@@ -47,7 +47,6 @@ impl<K, const R: usize, const C: usize> From<[[K; C]; R]> for Matrix<K> {
     }
 }
 
-//TODO Improve display (see subject)
 impl<K: fmt::Display> fmt::Display for Matrix<K> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for row in 0..self.rows {
@@ -63,6 +62,7 @@ impl<K: fmt::Display> fmt::Display for Matrix<K> {
 
             writeln!(f, "]")?;
         }
+
         Ok(())
     }
 }
@@ -71,14 +71,14 @@ impl<K> Index<(usize, usize)> for Matrix<K> {
     type Output = K;
 
     fn index(&self, (row, col): (usize, usize)) -> &Self::Output {
-        debug_assert!(row < self.rows && col < self.cols, "index out of bounds");
+        debug_assert!(row < self.rows && col < self.cols, "index out of bounds"); // FUCK
         &self.data[row * self.cols + col]
     }
 }
 
 impl<K> IndexMut<(usize, usize)> for Matrix<K> {
     fn index_mut(&mut self, (row, col): (usize, usize)) -> &mut Self::Output {
-        debug_assert!(row < self.rows && col < self.cols, "index out of bounds");
+        debug_assert!(row < self.rows && col < self.cols, "index out of bounds"); // FUCK
         &mut self.data[row * self.cols + col]
     }
 }
@@ -90,10 +90,8 @@ where
     pub fn add(&mut self, v: &Matrix<K>) {
         assert_eq!(self.shape(), v.shape(), "FUCK",);
 
-        for row in 0..self.rows {
-            for col in 0..self.cols {
-                self[(row, col)] += v[(row, col)];
-            }
+        for (a, b) in self.data.iter_mut().zip(v.data.iter()) {
+            *a += *b;
         }
     }
 }
@@ -105,10 +103,8 @@ where
     pub fn sub(&mut self, v: &Matrix<K>) {
         assert_eq!(self.shape(), v.shape(), "FUCK",);
 
-        for row in 0..self.rows {
-            for col in 0..self.cols {
-                self[(row, col)] -= v[(row, col)];
-            }
+        for (a, b) in self.data.iter_mut().zip(v.data.iter()) {
+            *a -= *b;
         }
     }
 }
@@ -118,10 +114,8 @@ where
     K: Copy + std::ops::MulAssign,
 {
     pub fn scl(&mut self, a: K) {
-        for row in 0..self.rows {
-            for col in 0..self.cols {
-                self[(row, col)] *= a;
-            }
+        for x in self.data.iter_mut() {
+            *x *= a;
         }
     }
 }
