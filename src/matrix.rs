@@ -1,12 +1,14 @@
 use std::fmt;
 use std::ops::{Index, IndexMut};
 
+// Structure
 pub struct Matrix<K> {
     data: Vec<K>,
     rows: usize,
     cols: usize,
 }
 
+// Constructors
 impl<K> Matrix<K> {
     pub fn rows(&self) -> usize {
         self.rows
