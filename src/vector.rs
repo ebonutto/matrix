@@ -102,7 +102,7 @@ impl<K> Vector<K>
 where
     K: Copy + std::iter::Sum + Mul<Output = K>,
 {
-    fn dot(&self, v: &Vector<K>) -> K {
+    pub fn dot(&self, v: &Vector<K>) -> K {
         assert_eq!(
             self.size(),
             v.size(),
@@ -111,7 +111,11 @@ where
             v.size()
         );
 
-        self.data.iter().zip(v.data.iter()).map(|(x, y)| x * y).sum()
+        self.data
+            .iter()
+            .zip(v.data.iter())
+            .map(|(&x, &y)| x * y)
+            .sum()
     }
 }
 
@@ -120,11 +124,11 @@ impl<K> Vector<K>
 where
     K: Copy + Into<f32>,
 {
-    fn norm_1(&self) -> f32 {
+    pub fn norm_1(&self) -> f32 {
         self.data.iter().map(|&x| x.into().abs()).sum()
     }
 
-    fn norm(&self) -> f32 {
+    pub fn norm(&self) -> f32 {
         self.data
             .iter()
             .map(|&x| {
@@ -135,7 +139,7 @@ where
             .sqrt()
     }
 
-    fn norm_inf(&self) -> f32 {
+    pub fn norm_inf(&self) -> f32 {
         self.data
             .iter()
             .map(|&x| x.into().abs())
@@ -144,7 +148,7 @@ where
 }
 
 // Cosine
-fn angle_cos<K>(u: &Vector<K>, v: &Vector<K>) -> f32
+pub fn angle_cos<K>(u: &Vector<K>, v: &Vector<K>) -> f32
 where
     K: Copy + std::iter::Sum + Mul<Output = K> + Into<f32>,
 {
