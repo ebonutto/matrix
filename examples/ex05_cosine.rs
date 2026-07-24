@@ -12,7 +12,7 @@ fn main() {
     // 0.0
 
     let u = Vector::from([-1., 1.]);
-    let v = Vector::from([ 1., -1.]);
+    let v = Vector::from([1., -1.]);
     println!("{}", angle_cos(&u, &v));
     // -1.0
 

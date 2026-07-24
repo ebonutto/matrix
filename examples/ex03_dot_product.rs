@@ -1,4 +1,4 @@
-use matrix::{Vector};
+use matrix::Vector;
 
 fn main() {
     let mut u = Vector::from([0., 0.]);

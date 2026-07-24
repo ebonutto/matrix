@@ -21,36 +21,21 @@ fn main() {
     // [4.0]
     // [6.0]
 
-    let mut u = Matrix::from([
-        [1., 2.],
-        [3., 4.]
-    ]);
-    let v = Matrix::from([
-        [7., 4.],
-        [-2., 2.]
-    ]);
+    let mut u = Matrix::from([[1., 2.], [3., 4.]]);
+    let v = Matrix::from([[7., 4.], [-2., 2.]]);
     u.add(&v);
     println!("{}", u);
     // [8.0, 6.0]
     // [1.0, 6.0]
 
-    let mut u = Matrix::from([
-        [1., 2.],
-        [3., 4.]
-    ]);
-    let v = Matrix::from([
-        [7., 4.],
-        [-2., 2.]
-    ]);
+    let mut u = Matrix::from([[1., 2.], [3., 4.]]);
+    let v = Matrix::from([[7., 4.], [-2., 2.]]);
     u.sub(&v);
     println!("{}", u);
     // [-6.0, -2.0]
     // [5.0, 2.0]
 
-    let mut u = Matrix::from([
-        [1., 2.],
-        [3., 4.]
-    ]);
+    let mut u = Matrix::from([[1., 2.], [3., 4.]]);
     u.scl(2.);
     println!("{}", u);
     // [2.0, 4.0]
