@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, SubAssign};
+use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
 // Structure
 pub struct Vector<K> {
@@ -10,6 +10,21 @@ pub struct Vector<K> {
 impl<K> Vector<K> {
     pub fn size(&self) -> usize {
         self.data.len()
+    }
+}
+
+// From
+impl<K, const N: usize> From<[K; N]> for Vector<K> {
+    fn from(data: [K; N]) -> Self {
+        Self {
+            data: data.into_iter().collect(),
+        }
+    }
+}
+
+impl<K> From<Vec<K>> for Vector<K> {
+    fn from(data: Vec<K>) -> Self {
+        Self { data }
     }
 }
 
@@ -28,15 +43,6 @@ impl<K> IndexMut<usize> for Vector<K> {
     }
 }
 
-// From
-impl<K, const N: usize> From<[K; N]> for Vector<K> {
-    fn from(data: [K; N]) -> Self {
-        Self {
-            data: data.into_iter().collect(),
-        }
-    }
-}
-
 // Display
 impl<K: fmt::Display> fmt::Display for Vector<K> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -48,7 +54,7 @@ impl<K: fmt::Display> fmt::Display for Vector<K> {
     }
 }
 
-// Operations
+// Arithmetic
 impl<K> Vector<K>
 where
     K: Copy + AddAssign,
@@ -98,9 +104,42 @@ where
     }
 }
 
+// Linear combination
+pub fn linear_combination<K>(u: &[Vector<K>], coefs: &[K]) -> Vector<K>
+where
+    K: Copy + Default + AddAssign + Mul<Output = K>,
+{
+    assert_eq!(
+        u.len(),
+        coefs.len(),
+        "linear_combination: {} vectors but {} coefficients",
+        u.len(),
+        coefs.len()
+    );
+    assert!(!u.is_empty(), "linear_combination: empty input");
+
+    let n = u[0].size();
+    let mut result = vec![K::default(); n];
+
+    for (vector, &coef) in u.iter().zip(coefs.iter()) {
+        assert_eq!(
+            vector.size(),
+            n,
+            "linear_combination: inconsistent vector sizes"
+        );
+
+        for (r, &x) in result.iter_mut().zip(vector.data.iter()) {
+            *r += x * coef;
+        }
+    }
+
+    Vector::from(result)
+}
+
+// Dot
 impl<K> Vector<K>
 where
-    K: Copy + std::iter::Sum + Mul<Output = K>,
+    K: Copy + Default + AddAssign + Mul<Output = K>,
 {
     pub fn dot(&self, v: &Vector<K>) -> K {
         assert_eq!(
@@ -111,11 +150,13 @@ where
             v.size()
         );
 
-        self.data
-            .iter()
-            .zip(v.data.iter())
-            .map(|(&x, &y)| x * y)
-            .sum()
+        let mut sum = K::default();
+
+        for (&a, &b) in self.data.iter().zip(v.data.iter()) {
+            sum += a * b;
+        }
+
+        sum
     }
 }
 
@@ -150,29 +191,48 @@ where
 // Cosine
 pub fn angle_cos<K>(u: &Vector<K>, v: &Vector<K>) -> f32
 where
-    K: Copy + std::iter::Sum + Mul<Output = K> + Into<f32>,
+    K: Copy + Default + AddAssign + Mul<Output = K> + Into<f32>,
 {
-    // Zero
-    // Size
-    u.dot(v).into() / (u.norm() * v.norm())
+    assert_eq!(
+        u.size(),
+        v.size(),
+        "angle_cos: size mismatch ({} vs {})",
+        u.size(),
+        v.size()
+    );
+    assert!(u.size() > 0, "angle_cos: vectors must be non-empty");
+
+    let norm_u = u.norm();
+    let norm_v = v.norm();
+    assert!(
+        norm_u != 0.0 && norm_v != 0.0,
+        "angle_cos: undefined for 0 vectors"
+    );
+
+    u.dot(v).into() / (norm_u * norm_v)
 }
 
-// pub fn linear_combination<K>(u: &[Vector<K>], coefs: &[K]) -> Vector<K>
-// where
-//     K: Copy + Default + AddAssign + Mul<Output = K>,
-// {
-//     // assert_eq!(u.size(), v.size(), "FUCK");
-//     assert!(!u.is_empty(), "linear_combination: empty input");
+// Cross product
+pub fn cross_product<K>(u: &Vector<K>, v: &Vector<K>) -> Vector<K>
+where
+    K: Copy + Sub<Output = K> + Mul<Output = K>,
+{
+    assert_eq!(
+        u.size(),
+        3,
+        "cross_product: u is not 3-dimensional (size {})",
+        u.size()
+    );
+    assert_eq!(
+        v.size(),
+        3,
+        "cross_product: v is not 3-dimensional (size {})",
+        v.size()
+    );
 
-//     let n = u[0].size();
-//     let mut result = vec![K::default(); n];
+    let s1 = u[1] * v[2] - u[2] * v[1];
+    let s2 = u[2] * v[0] - u[0] * v[2];
+    let s3 = u[0] * v[1] - u[1] * v[0];
 
-//     for (vector, &coef) in u.iter().zip(coefs.iter()) {
-//         // assert_eq
-//         for (r, &x) in result.iter_mut().zip(vector.data.iter()) {
-//             *r += x * coef;
-//         }
-//     }
-
-//     Vector { data: result }
-// }
+    Vector::from([s1, s2, s3])
+}
