@@ -90,7 +90,7 @@ where
     K: Copy + std::ops::AddAssign,
 {
     pub fn add(&mut self, v: &Matrix<K>) {
-        assert_eq!(self.shape(), v.shape(), "FUCK",);
+        assert_eq!(self.shape(), v.shape(), "Matrix::add: shape mismatch ({:?} vs {:?})", self.shape(), v.shape());
 
         for (a, b) in self.data.iter_mut().zip(v.data.iter()) {
             *a += *b;
@@ -103,7 +103,7 @@ where
     K: Copy + std::ops::SubAssign,
 {
     pub fn sub(&mut self, v: &Matrix<K>) {
-        assert_eq!(self.shape(), v.shape(), "FUCK",);
+        assert_eq!(self.shape(), v.shape(), "Matrix::sub: shape mismatch ({:?} vs {:?})", self.shape(), v.shape());
 
         for (a, b) in self.data.iter_mut().zip(v.data.iter()) {
             *a -= *b;

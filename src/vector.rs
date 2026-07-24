@@ -28,7 +28,7 @@ impl<K> From<Vec<K>> for Vector<K> {
     }
 }
 
-// Index
+// Index //! Index out of bounds
 impl<K> Index<usize> for Vector<K> {
     type Output = K;
 
@@ -235,4 +235,9 @@ where
     let s3 = u[0] * v[1] - u[1] * v[0];
 
     Vector::from([s1, s2, s3])
+}
+
+#[cfg(test)]
+mod tests {
+
 }
