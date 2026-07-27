@@ -2,6 +2,7 @@ use std::fmt;
 use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
 // Structure
+#[derive(Debug, PartialEq)]
 pub struct Vector<K> {
     data: Vec<K>,
 }
@@ -239,5 +240,97 @@ where
 
 #[cfg(test)]
 mod tests {
+    use super::*;
 
+    #[test]
+    fn test_addition_f32_basic() {
+        let mut u: Vector<f32> = Vector::from([2., 3.]);
+        let v: Vector<f32> = Vector::from([5., 7.]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([7., 10.]));
+
+        let mut u: Vector<f32> = Vector::from([-3., 5., -1.]);
+        let v: Vector<f32> = Vector::from([1., 0., 1.]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([-2., 5., 0.]));
+
+        let mut u: Vector<f32> = Vector::from([1.]);
+        let v: Vector<f32> = Vector::from([3.]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([4.]));
+    }
+
+    #[test]
+    fn test_addition_f32_zero() {
+        let mut u: Vector<f32> = Vector::from([0., 0.]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([0., 0.]));
+    }
+
+    #[test]
+    fn test_addition_f32_empty() {
+        let mut u: Vector<f32> = Vector::from([]);
+        let v: Vector<f32> = Vector::from([]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([]));
+    }
+
+    #[test]
+    #[should_panic(expected = "size mismatch")]
+    fn test_addition_f32_panic_size_mismatch() {
+        let mut u: Vector<f32> = Vector::from([1., 2.]);
+        let v: Vector<f32> = Vector::from([1., 2., 3.]);
+        u.add(&v);
+    }
+
+    #[test]
+    fn test_addition_i32_basic() {
+        let mut u: Vector<i32> = Vector::from([2, 3]);
+        let v: Vector<i32> = Vector::from([5, 7]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([7, 10]));
+
+        let mut u: Vector<i32> = Vector::from([-3, 5, -1]);
+        let v: Vector<i32> = Vector::from([1, 0, 1]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([-2, 5, 0]));
+
+        let mut u: Vector<i32> = Vector::from([1]);
+        let v: Vector<i32> = Vector::from([3]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([4]));
+    }
+
+    #[test]
+    fn test_addition_i32_zero() {
+        let mut u: Vector<i32> = Vector::from([0, 0]);
+        let v: Vector<i32> = Vector::from([0, 0]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([0, 0]));
+    }
+
+    #[test]
+    fn test_addition_i32_empty() {
+        let mut u: Vector<i32> = Vector::from([]);
+        let v: Vector<i32> = Vector::from([]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([]));
+    }
+
+    #[test]
+    #[should_panic(expected = "size mismatch")]
+    fn test_addition_i32_panic_size_mismatch() {
+        let mut u: Vector<i32> = Vector::from([1, 2]);
+        let v: Vector<i32> = Vector::from([1, 2, 3]);
+        u.add(&v);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_addition_i32_panic_overflow() {
+        let mut u: Vector<i32> = Vector::from([i32::MAX]);
+        let v: Vector<i32> = Vector::from([1]);
+        u.add(&v);
+    }
 }
