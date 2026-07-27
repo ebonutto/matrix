@@ -495,6 +495,39 @@ mod tests {
         assert_eq!(u, Vector::from([]));
     }
 
+    // Linear combination f32
+    #[test]
+    fn test_linear_combination_f32_basic() {
+        let e1 = Vector::from([1., 0., 0.]);
+        let e2 = Vector::from([0., 1., 0.]);
+        let e3 = Vector::from([0., 0., 1.]);
+
+        let v1 = Vector::from([1., 2., 3.]);
+        let v2 = Vector::from([0., 10., -100.]);
+
+        assert_eq!(linear_combination(&[e1, e2, e3], &[10., -2., 0.5]), Vector::from([10., -2., 0.5]));
+
+        assert_eq!(linear_combination(&[v1, v2], &[10., -2.]), Vector::from([10., 0., 230.]));
+    }
+
+    #[test]
+    fn test_linear_combination_f32_zero() {
+        let e1 = Vector::from([0., 0., 0.]);
+        let e2 = Vector::from([0., 0., 0.]);
+        let e3 = Vector::from([0., 0., 0.]);
+
+        assert_eq!(linear_combination(&[e1, e2, e3], &[0., 0., 0.]), Vector::from([0., 0., 0.]));
+    }
+
+    // #[test]
+    // fn test_linear_combination_f32_empty() {
+    //     let u: Vector<f32> = Vector::from([]);
+    //     let v: Vector<f32> = Vector::from([]);
+    //     assert_eq!(linear_combination(&[e1, e2, e3], &[0., 0., 0.]), Vector::from([0., 0., 0.]));
+    // }
+
+    // Linear interpolation
+
     // Dot product f32
     #[test]
     fn test_dot_product_f32_basic() {
