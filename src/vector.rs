@@ -594,18 +594,18 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "undefined for zero vectors")]
-    fn test_angle_cos_f32_panic_zero() {
-        let v: Vector<f32> = Vector::from([0., 0.]);
-        let u: Vector<f32> = Vector::from([0., 0.]);
-        angle_cos(&u, &v);
-    }
-
-    #[test]
     #[should_panic(expected = "undefined for empty vectors")]
     fn test_angle_cos_f32_panic_empty() {
         let u: Vector<f32> = Vector::from([]);
         let v: Vector<f32> = Vector::from([]);
+        angle_cos(&u, &v);
+    }
+
+    #[test]
+    #[should_panic(expected = "undefined for zero vectors")]
+    fn test_angle_cos_f32_panic_zero() {
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        let u: Vector<f32> = Vector::from([0., 0.]);
         angle_cos(&u, &v);
     }
 
@@ -638,18 +638,18 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "undefined for zero vectors")]
-    fn test_angle_cos_i16_panic_zero() {
-        let v: Vector<i16> = Vector::from([0, 0]);
-        let u: Vector<i16> = Vector::from([0, 0]);
-        angle_cos(&u, &v);
-    }
-
-    #[test]
     #[should_panic(expected = "undefined for empty vectors")]
     fn test_angle_cos_i16_panic_empty() {
         let u: Vector<i16> = Vector::from([]);
         let v: Vector<i16> = Vector::from([]);
+        angle_cos(&u, &v);
+    }
+
+    #[test]
+    #[should_panic(expected = "undefined for zero vectors")]
+    fn test_angle_cos_i16_panic_zero() {
+        let v: Vector<i16> = Vector::from([0, 0]);
+        let u: Vector<i16> = Vector::from([0, 0]);
         angle_cos(&u, &v);
     }
 
