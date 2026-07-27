@@ -343,6 +343,52 @@ mod tests {
 
     // Substraction f32
 
+
+
+    #[test]
+    fn test_substraction_f32_basic() {
+        let mut u: Vector<f32> = Vector::from([2., 3.]);
+        let v: Vector<f32> = Vector::from([5., 7.]);
+        u.sub(&v);
+        assert_eq!(u, Vector::from([7., 10.]));
+
+        let mut u: Vector<f32> = Vector::from([-3., 5., -1.]);
+        let v: Vector<f32> = Vector::from([1., 0., 1.]);
+        u.sub(&v);
+        assert_eq!(u, Vector::from([-2., 5., 0.]));
+
+        let mut u: Vector<f32> = Vector::from([1.]);
+        let v: Vector<f32> = Vector::from([3.]);
+        u.sub(&v);
+        assert_eq!(u, Vector::from([4.]));
+    }
+
+    #[test]
+    fn test_substraction_f32_zero() {
+        let mut u: Vector<f32> = Vector::from([0., 0.]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        u.sub(&v);
+        assert_eq!(u, Vector::from([0., 0.]));
+    }
+
+    #[test]
+    fn test_substraction_f32_empty() {
+        let mut u: Vector<f32> = Vector::from([]);
+        let v: Vector<f32> = Vector::from([]);
+        u.sub(&v);
+        assert_eq!(u, Vector::from([]));
+    }
+
+    #[test]
+    #[should_panic(expected = "size mismatch")]
+    fn test_substraction_f32_panic_size_mismatch() {
+        let mut u: Vector<f32> = Vector::from([1., 2.]);
+        let v: Vector<f32> = Vector::from([1., 2., 3.]);
+        u.sub(&v);
+    }
+
+
+
     // Dot product f32
     #[test]
     fn test_dot_product_f32_basic() {
