@@ -242,6 +242,11 @@ where
 mod tests {
     use super::*;
 
+    fn approx_eq(a: f32, b: f32) -> bool {
+        (a - b).abs() < 1e-5
+    }
+
+    // Addition f32
     #[test]
     fn test_addition_f32_basic() {
         let mut u: Vector<f32> = Vector::from([2., 3.]);
@@ -284,6 +289,7 @@ mod tests {
         u.add(&v);
     }
 
+    // Addition i32
     #[test]
     fn test_addition_i32_basic() {
         let mut u: Vector<i32> = Vector::from([2, 3]);
@@ -332,5 +338,185 @@ mod tests {
         let mut u: Vector<i32> = Vector::from([i32::MAX]);
         let v: Vector<i32> = Vector::from([1]);
         u.add(&v);
+    }
+
+    // Substraction f32
+
+    // Dot product f32
+    #[test]
+    fn test_dot_product_f32_basic() {
+        let u: Vector<f32> = Vector::from([1., 1.]);
+        let v: Vector<f32> = Vector::from([1., 1.]);
+        assert_eq!(u.dot(&v), 2.);
+
+        let u: Vector<f32> = Vector::from([-1., 6.]);
+        let v: Vector<f32> = Vector::from([3., 2.]);
+        assert_eq!(u.dot(&v), 9.);
+    }
+
+    #[test]
+    fn test_dot_product_f32_zero() {
+        let u: Vector<f32> = Vector::from([0., 0.]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        assert_eq!(u.dot(&v), 0.);
+    }
+
+    #[test]
+    fn test_dot_product_f32_empty() {
+        let u: Vector<f32> = Vector::from([]);
+        let v: Vector<f32> = Vector::from([]);
+        assert_eq!(u.dot(&v), 0.);
+    }
+
+    #[test]
+    #[should_panic(expected = "size mismatch")]
+    fn test_dot_product_f32_panic_size_mismatch() {
+        let u: Vector<f32> = Vector::from([1., 2.]);
+        let v: Vector<f32> = Vector::from([1., 2., 3.]);
+        u.dot(&v);
+    }
+
+    // Dot product i32
+    #[test]
+    fn test_dot_product_i32_basic() {
+        let u: Vector<i32> = Vector::from([1, 1]);
+        let v: Vector<i32> = Vector::from([1, 1]);
+        assert_eq!(u.dot(&v), 2);
+
+        let u: Vector<i32> = Vector::from([-1, 6]);
+        let v: Vector<i32> = Vector::from([3, 2]);
+        assert_eq!(u.dot(&v), 9);
+    }
+
+    #[test]
+    fn test_dot_product_i32_zero() {
+        let u: Vector<i32> = Vector::from([0, 0]);
+        let v: Vector<i32> = Vector::from([0, 0]);
+        assert_eq!(u.dot(&v), 0);
+    }
+
+    #[test]
+    fn test_dot_product_i32_empty() {
+        let u: Vector<i32> = Vector::from([]);
+        let v: Vector<i32> = Vector::from([]);
+        assert_eq!(u.dot(&v), 0);
+    }
+
+    #[test]
+    #[should_panic(expected = "size mismatch")]
+    fn test_dot_product_i32_panic_size_mismatch() {
+        let u: Vector<i32> = Vector::from([1, 2]);
+        let v: Vector<i32> = Vector::from([1, 2, 3]);
+        u.dot(&v);
+    }
+
+    // Angle cos f32
+    #[test]
+    fn test_angle_cos_f32_basic() {
+        let u: Vector<f32> = Vector::from([1., 0.]);
+        let v: Vector<f32> = Vector::from([1., 0.]);
+        assert_eq!(angle_cos(&u, &v), 1.);
+
+        let u: Vector<f32> = Vector::from([1., 0.]);
+        let v: Vector<f32> = Vector::from([0., 1.]);
+        assert_eq!(angle_cos(&u, &v), 0.);
+
+        let u: Vector<f32> = Vector::from([-1., 1.]);
+        let v: Vector<f32> = Vector::from([1., -1.]);
+        assert!(approx_eq(angle_cos(&u, &v), -1.));
+
+        let u: Vector<f32> = Vector::from([2., 1.]);
+        let v: Vector<f32> = Vector::from([4., 2.]);
+        assert_eq!(angle_cos(&u, &v), 1.);
+
+        let u: Vector<f32> = Vector::from([1., 2., 3.]);
+        let v: Vector<f32> = Vector::from([4., 5., 6.]);
+        assert!(approx_eq(angle_cos(&u, &v), 0.974631846));
+
+        let u: Vector<f32> = Vector::from([1.]);
+        let v: Vector<f32> = Vector::from([3.]);
+        assert_eq!(angle_cos(&u, &v), 1.);
+    }
+
+    #[test]
+    #[should_panic(expected = "undefined for 0 vectors")]
+    fn test_angle_cos_f32_panic_zero() {
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        let u: Vector<f32> = Vector::from([0., 0.]);
+        angle_cos(&u, &v);
+    }
+
+    #[test]
+    #[should_panic(expected = "vectors must be non-empty")]
+    fn test_angle_cos_f32_panic_empty() {
+        let u: Vector<f32> = Vector::from([]);
+        let v: Vector<f32> = Vector::from([]);
+        angle_cos(&u, &v);
+    }
+
+    // // Angle cos i32
+    // #[test]
+    // fn test_angle_cos_i32_basic() {
+    //     let u: Vector<i32> = Vector::from([1, 0]);
+    //     let v: Vector<i32> = Vector::from([1, 0]);
+    //     assert_eq!(angle_cos(&u, &v), 1.);
+
+    //     let u: Vector<i32> = Vector::from([1, 0]);
+    //     let v: Vector<i32> = Vector::from([0, 1]);
+    //     assert_eq!(angle_cos(&u, &v), 0.);
+
+    //     let u: Vector<i32> = Vector::from([-1, 1]);
+    //     let v: Vector<i32> = Vector::from([ 1, -1]);
+    //     assert!(approx_eq(angle_cos(&u, &v), -1));
+
+    //     let u: Vector<i32> = Vector::from([2, 1]);
+    //     let v: Vector<i32> = Vector::from([4, 2]);
+    //     assert_eq!(angle_cos(&u, &v), 1.);
+
+    //     let u: Vector<i32> = Vector::from([1, 2, 3]);
+    //     let v: Vector<i32> = Vector::from([4, 5, 6]);
+    //     assert!(approx_eq(angle_cos(&u, &v), 0.974631846));
+
+    //     let u: Vector<i32> = Vector::from([1]);
+    //     let v: Vector<i32> = Vector::from([3]);
+    //     assert_eq!(angle_cos(&u, &v), 1.);
+    // }
+
+    // #[test]
+    // #[should_panic(expected = "undefined for 0 vectors")]
+    // fn test_angle_cos_i32_panic_zero() {
+    //     let v: Vector<i32> = Vector::from([0, 0]);
+    //     let u: Vector<i32> = Vector::from([0, 0]);
+    //     angle_cos(&u, &v);
+    // }
+
+    // #[test]
+    // #[should_panic(expected = "vectors must be non-empty")]
+    // fn test_angle_cos_i32_panic_empty() {
+    //     let u: Vector<i32> = Vector::from([]);
+    //     let v: Vector<i32> = Vector::from([]);
+    //     angle_cos(&u, &v);
+    // }
+
+    #[test]
+    fn test_cross_product_f32_basic() {
+        let u = Vector::from([0., 0., 1.]);
+        let v = Vector::from([1., 0., 0.]);
+        assert_eq!(cross_product(&u, &v), Vector::from([0., 1., 0.]));
+
+        let u = Vector::from([1., 2., 3.]);
+        let v = Vector::from([4., 5., 6.]);
+        assert_eq!(cross_product(&u, &v), Vector::from([-3., 6., -3.]));
+
+        let u = Vector::from([4., 2., -3.]);
+        let v = Vector::from([-2., -5., 16.]);
+        assert_eq!(cross_product(&u, &v), Vector::from([17., -58., -16.]));
+    }
+
+    #[test]
+    fn test_cross_product_f32_zero() {
+        let u = Vector::from([0., 0., 0.]);
+        let v = Vector::from([0., 0., 0.]);
+        assert_eq!(cross_product(&u, &v), Vector::from([0., 0., 0.]));
     }
 }
