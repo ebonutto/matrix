@@ -137,7 +137,7 @@ where
     Vector::from(result)
 }
 
-// Dot
+// Dot product
 impl<K> Vector<K>
 where
     K: Copy + Default + AddAssign + Mul<Output = K>,
@@ -201,13 +201,13 @@ where
         u.size(),
         v.size()
     );
-    assert!(u.size() > 0, "angle_cos: vectors must be non-empty");
+    assert!(u.size() > 0, "angle_cos: undefined for empty vectors");
 
     let norm_u = u.norm();
     let norm_v = v.norm();
     assert!(
         norm_u != 0.0 && norm_v != 0.0,
-        "angle_cos: undefined for 0 vectors"
+        "angle_cos: undefined for zero vectors"
     );
 
     u.dot(v).into() / (norm_u * norm_v)
@@ -220,15 +220,16 @@ where
 {
     assert_eq!(
         u.size(),
-        3,
-        "cross_product: u is not 3-dimensional (size {})",
-        u.size()
+        v.size(),
+        "cross_product: size mismatch ({} vs {})",
+        u.size(),
+        v.size()
     );
     assert_eq!(
-        v.size(),
+        u.size(),
         3,
-        "cross_product: v is not 3-dimensional (size {})",
-        v.size()
+        "cross_product: undefined for non-three-dimensional vectors ({})",
+        u.size()
     );
 
     let s1 = u[1] * v[2] - u[2] * v[1];
@@ -410,6 +411,8 @@ mod tests {
         u.dot(&v);
     }
 
+    // Test overflow
+
     // Angle cos f32
     #[test]
     fn test_angle_cos_f32_basic() {
@@ -439,7 +442,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "undefined for 0 vectors")]
+    #[should_panic(expected = "undefined for zero vectors")]
     fn test_angle_cos_f32_panic_zero() {
         let v: Vector<f32> = Vector::from([0., 0.]);
         let u: Vector<f32> = Vector::from([0., 0.]);
@@ -447,7 +450,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "vectors must be non-empty")]
+    #[should_panic(expected = "undefined for empty vectors")]
     fn test_angle_cos_f32_panic_empty() {
         let u: Vector<f32> = Vector::from([]);
         let v: Vector<f32> = Vector::from([]);
@@ -483,7 +486,7 @@ mod tests {
     // }
 
     // #[test]
-    // #[should_panic(expected = "undefined for 0 vectors")]
+    // #[should_panic(expected = "undefined for zero vectors")]
     // fn test_angle_cos_i32_panic_zero() {
     //     let v: Vector<i32> = Vector::from([0, 0]);
     //     let u: Vector<i32> = Vector::from([0, 0]);
@@ -498,25 +501,97 @@ mod tests {
     //     angle_cos(&u, &v);
     // }
 
+    // Cross product f32
     #[test]
     fn test_cross_product_f32_basic() {
-        let u = Vector::from([0., 0., 1.]);
-        let v = Vector::from([1., 0., 0.]);
+        let u: Vector<f32> = Vector::from([0., 0., 1.]);
+        let v: Vector<f32> = Vector::from([1., 0., 0.]);
         assert_eq!(cross_product(&u, &v), Vector::from([0., 1., 0.]));
 
-        let u = Vector::from([1., 2., 3.]);
-        let v = Vector::from([4., 5., 6.]);
+        let u: Vector<f32> = Vector::from([1., 2., 3.]);
+        let v: Vector<f32> = Vector::from([4., 5., 6.]);
         assert_eq!(cross_product(&u, &v), Vector::from([-3., 6., -3.]));
 
-        let u = Vector::from([4., 2., -3.]);
-        let v = Vector::from([-2., -5., 16.]);
+        let u: Vector<f32> = Vector::from([4., 2., -3.]);
+        let v: Vector<f32> = Vector::from([-2., -5., 16.]);
         assert_eq!(cross_product(&u, &v), Vector::from([17., -58., -16.]));
     }
 
     #[test]
     fn test_cross_product_f32_zero() {
-        let u = Vector::from([0., 0., 0.]);
-        let v = Vector::from([0., 0., 0.]);
+        let u: Vector<f32> = Vector::from([0., 0., 0.]);
+        let v: Vector<f32> = Vector::from([0., 0., 0.]);
         assert_eq!(cross_product(&u, &v), Vector::from([0., 0., 0.]));
+    }
+
+    #[test]
+    #[should_panic(expected = "undefined for non-three-dimensional vectors")]
+    fn test_cross_product_f32_empty() {
+        let u: Vector<f32> = Vector::from([]);
+        let v: Vector<f32> = Vector::from([]);
+        cross_product(&u, &v);
+    }
+
+    #[test]
+    #[should_panic(expected = "size mismatch")]
+    fn test_cross_product_f32_panic_size_mismatch() {
+        let u: Vector<f32> = Vector::from([1., 2.]);
+        let v: Vector<f32> = Vector::from([1., 2., 3.]);
+        cross_product(&u, &v);
+    }
+
+    #[test]
+    #[should_panic(expected = "undefined for non-three-dimensional vectors")]
+    fn test_cross_product_f32_panic_non_three_dimensional() {
+        let u: Vector<f32> = Vector::from([1., 2.]);
+        let v: Vector<f32> = Vector::from([1., 2.]);
+        cross_product(&u, &v);
+    }
+
+    // Cross product i32
+    #[test]
+    fn test_cross_product_i32_basic() {
+        let u: Vector<i32> = Vector::from([0, 0, 1]);
+        let v: Vector<i32> = Vector::from([1, 0, 0]);
+        assert_eq!(cross_product(&u, &v), Vector::from([0, 1, 0]));
+
+        let u: Vector<i32> = Vector::from([1, 2, 3]);
+        let v: Vector<i32> = Vector::from([4, 5, 6]);
+        assert_eq!(cross_product(&u, &v), Vector::from([-3, 6, -3]));
+
+        let u: Vector<i32> = Vector::from([4, 2, -3]);
+        let v: Vector<i32> = Vector::from([-2, -5, 16]);
+        assert_eq!(cross_product(&u, &v), Vector::from([17, -58, -16]));
+    }
+
+    #[test]
+    fn test_cross_product_i32_zero() {
+        let u: Vector<i32> = Vector::from([0, 0, 0]);
+        let v: Vector<i32> = Vector::from([0, 0, 0]);
+        assert_eq!(cross_product(&u, &v), Vector::from([0, 0, 0]));
+    }
+
+    #[test]
+    #[should_panic(expected = "undefined for non-three-dimensional vectors")]
+    fn test_cross_product_i32_empty() {
+        let u: Vector<i32> = Vector::from([]);
+        let v: Vector<i32> = Vector::from([]);
+        cross_product(&u, &v);
+    }
+
+    #[test]
+    #[should_panic(expected = "size mismatch")]
+    fn test_cross_product_i32_panic_size_mismatch() {
+        let u: Vector<i32> = Vector::from([1, 2]);
+        let v: Vector<i32> = Vector::from([1, 2, 3]);
+        cross_product(&u, &v);
+    }
+
+    #[test]
+    #[should_panic(expected = "undefined for non-three-dimensional vectors")]
+    fn test_cross_product_i32_panic_non_three_dimensional() {
+        let u: Vector<i32> = Vector::from([1, 2]);
+        let v: Vector<i32> = Vector::from([1, 2]);
+        cross_product(&u, &v);
     }
 }
