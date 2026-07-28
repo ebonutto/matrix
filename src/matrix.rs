@@ -2,6 +2,7 @@ use std::fmt;
 use std::ops::{Index, IndexMut};
 
 // Structure
+#[derive(Debug, PartialEq)]
 pub struct Matrix<K> {
     data: Vec<K>,
     rows: usize,
@@ -131,5 +132,194 @@ where
         for x in self.data.iter_mut() {
             *x *= a;
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Addition f32
+    #[test]
+    fn test_addition_f32_basic() {
+        let mut u: Matrix<f32> = Matrix::from([[1., 2.], [3., 4.]]);
+        let v: Matrix<f32> = Matrix::from([[7., 4.], [-2., 2.]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[8., 6.], [1., 6.]]));
+    }
+
+    #[test]
+    fn test_addition_f32_zero() {
+        let mut u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        let v: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[0., 0.], [0., 0.]]));
+    }
+
+    #[test]
+    fn test_addition_f32_empty() {
+        let mut u: Matrix<f32> = Matrix::from([[]]);
+        let v: Matrix<f32> = Matrix::from([[]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[]]));
+    }
+
+    #[test]
+    #[should_panic(expected = "shape mismatch")]
+    fn test_addition_f32_panic_shape_mismatch() {
+        let mut u: Matrix<f32> = Matrix::from([[1., 2.]]);
+        let v: Matrix<f32> = Matrix::from([[1.], [2.]]);
+        u.add(&v);
+    }
+
+    // Addition i32
+    #[test]
+    fn test_addition_i32_basic() {
+        let mut u: Matrix<i32> = Matrix::from([[1, 2], [3, 4]]);
+        let v: Matrix<i32> = Matrix::from([[7, 4], [-2, 2]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[8, 6], [1, 6]]));
+    }
+
+    #[test]
+    fn test_addition_i32_zero() {
+        let mut u: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
+        let v: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[0, 0], [0, 0]]));
+    }
+
+    #[test]
+    fn test_addition_i32_empty() {
+        let mut u: Matrix<i32> = Matrix::from([[]]);
+        let v: Matrix<i32> = Matrix::from([[]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[]]));
+    }
+
+    #[test]
+    #[should_panic(expected = "shape mismatch")]
+    fn test_addition_i32_panic_shape_mismatch() {
+        let mut u: Matrix<i32> = Matrix::from([[1, 2]]);
+        let v: Matrix<i32> = Matrix::from([[1], [2]]);
+        u.add(&v);
+    }
+
+    // Substraction f32
+    #[test]
+    fn test_substraction_f32_basic() {
+        let mut u: Matrix<f32> = Matrix::from([[1., 2.], [3., 4.]]);
+        let v: Matrix<f32> = Matrix::from([[7., 4.], [-2., 2.]]);
+        u.sub(&v);
+        assert_eq!(u, Matrix::from([[-6., -2.], [5., 2.]]));
+    }
+
+    #[test]
+    fn test_substraction_f32_zero() {
+        let mut u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        let v: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        u.sub(&v);
+        assert_eq!(u, Matrix::from([[0., 0.], [0., 0.]]));
+    }
+
+    #[test]
+    fn test_substraction_f32_empty() {
+        let mut u: Matrix<f32> = Matrix::from([[]]);
+        let v: Matrix<f32> = Matrix::from([[]]);
+        u.sub(&v);
+        assert_eq!(u, Matrix::from([[]]));
+    }
+
+    #[test]
+    #[should_panic(expected = "shape mismatch")]
+    fn test_substraction_f32_panic_shape_mismatch() {
+        let mut u: Matrix<f32> = Matrix::from([[1., 2.]]);
+        let v: Matrix<f32> = Matrix::from([[1.], [2.]]);
+        u.sub(&v);
+    }
+
+    // Substraction i32
+    #[test]
+    fn test_substraction_i32_basic() {
+        let mut u: Matrix<i32> = Matrix::from([[1, 2], [3, 4]]);
+        let v: Matrix<i32> = Matrix::from([[7, 4], [-2, 2]]);
+        u.sub(&v);
+        assert_eq!(u, Matrix::from([[-6, -2], [5, 2]]));
+    }
+
+    #[test]
+    fn test_substraction_i32_zero() {
+        let mut u: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
+        let v: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
+        u.sub(&v);
+        assert_eq!(u, Matrix::from([[0, 0], [0, 0]]));
+    }
+
+    #[test]
+    fn test_substraction_i32_empty() {
+        let mut u: Matrix<i32> = Matrix::from([[]]);
+        let v: Matrix<i32> = Matrix::from([[]]);
+        u.sub(&v);
+        assert_eq!(u, Matrix::from([[]]));
+    }
+
+    #[test]
+    #[should_panic(expected = "shape mismatch")]
+    fn test_substraction_i32_panic_shape_mismatch() {
+        let mut u: Matrix<i32> = Matrix::from([[1, 2]]);
+        let v: Matrix<i32> = Matrix::from([[1], [2]]);
+        u.sub(&v);
+    }
+
+    // Scalar f32
+    #[test]
+    fn test_scalar_f32_basic() {
+        let mut u: Matrix<f32> = Matrix::from([[1., 2.], [3., 4.]]);
+        u.scl(2.);
+        assert_eq!(u, Matrix::from([[2., 4.], [6., 8.]]));
+    }
+
+    #[test]
+    fn test_scalar_f32_zero() {
+        let mut u: Matrix<f32> = Matrix::from([[1., 2.], [3., 4.]]);
+        u.scl(0.);
+        assert_eq!(u, Matrix::from([[0., 0.], [0., 0.]]));
+
+        let mut u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        u.scl(0.);
+        assert_eq!(u, Matrix::from([[0., 0.], [0., 0.]]));
+    }
+
+    #[test]
+    fn test_scalar_f32_empty() {
+        let mut u: Matrix<f32> = Matrix::from([[]]);
+        u.scl(1.);
+        assert_eq!(u, Matrix::from([[]]));
+    }
+
+    // Scalar i32
+    #[test]
+    fn test_scalar_i32_basic() {
+        let mut u: Matrix<i32> = Matrix::from([[1, 2], [3, 4]]);
+        u.scl(2);
+        assert_eq!(u, Matrix::from([[2, 4], [6, 8]]));
+    }
+
+    #[test]
+    fn test_scalar_i32_zero() {
+        let mut u: Matrix<i32> = Matrix::from([[1, 2], [3, 4]]);
+        u.scl(0);
+        assert_eq!(u, Matrix::from([[0, 0], [0, 0]]));
+
+        let mut u: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
+        u.scl(0);
+        assert_eq!(u, Matrix::from([[0, 0], [0, 0]]));
+    }
+
+    #[test]
+    fn test_scalar_i32_empty() {
+        let mut u: Matrix<i32> = Matrix::from([[]]);
+        u.scl(1);
+        assert_eq!(u, Matrix::from([[]]));
     }
 }
