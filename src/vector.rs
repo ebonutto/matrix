@@ -268,6 +268,11 @@ mod tests {
 
     #[test]
     fn test_addition_f32_zero() {
+        let mut u: Vector<f32> = Vector::from([1., 2.]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([1., 2.]));
+
         let mut u: Vector<f32> = Vector::from([0., 0.]);
         let v: Vector<f32> = Vector::from([0., 0.]);
         u.add(&v);
@@ -311,6 +316,11 @@ mod tests {
 
     #[test]
     fn test_addition_i32_zero() {
+        let mut u: Vector<i32> = Vector::from([1, 2]);
+        let v: Vector<i32> = Vector::from([0, 0]);
+        u.add(&v);
+        assert_eq!(u, Vector::from([1, 2]));
+
         let mut u: Vector<i32> = Vector::from([0, 0]);
         let v: Vector<i32> = Vector::from([0, 0]);
         u.add(&v);
@@ -362,6 +372,11 @@ mod tests {
 
     #[test]
     fn test_substraction_f32_zero() {
+        let mut u: Vector<f32> = Vector::from([1., 2.]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        u.sub(&v);
+        assert_eq!(u, Vector::from([1., 2.]));
+
         let mut u: Vector<f32> = Vector::from([0., 0.]);
         let v: Vector<f32> = Vector::from([0., 0.]);
         u.sub(&v);
@@ -405,6 +420,11 @@ mod tests {
 
     #[test]
     fn test_substraction_i32_zero() {
+        let mut u: Vector<i32> = Vector::from([1, 2]);
+        let v: Vector<i32> = Vector::from([0, 0]);
+        u.sub(&v);
+        assert_eq!(u, Vector::from([1, 2]));
+
         let mut u: Vector<i32> = Vector::from([0, 0]);
         let v: Vector<i32> = Vector::from([0, 0]);
         u.sub(&v);
@@ -427,6 +447,14 @@ mod tests {
         u.sub(&v);
     }
 
+    #[test]
+    #[should_panic]
+    fn test_substraction_i32_panic_underflow() {
+        let mut u: Vector<i32> = Vector::from([i32::MIN]);
+        let v: Vector<i32> = Vector::from([1]);
+        u.sub(&v);
+    }
+
     // Scalar f32
     #[test]
     fn test_scalar_f32_basic() {
@@ -445,11 +473,11 @@ mod tests {
 
     #[test]
     fn test_scalar_f32_zero() {
-        let mut u: Vector<f32> = Vector::from([0., 0.]);
+        let mut u: Vector<f32> = Vector::from([1., 2.]);
         u.scl(0.);
         assert_eq!(u, Vector::from([0., 0.]));
 
-        let mut u: Vector<f32> = Vector::from([1., 2.]);
+        let mut u: Vector<f32> = Vector::from([0., 0.]);
         u.scl(0.);
         assert_eq!(u, Vector::from([0., 0.]));
     }
@@ -479,11 +507,11 @@ mod tests {
 
     #[test]
     fn test_scalar_i32_zero() {
-        let mut u: Vector<i32> = Vector::from([0, 0]);
+        let mut u: Vector<i32> = Vector::from([1, 2]);
         u.scl(0);
         assert_eq!(u, Vector::from([0, 0]));
 
-        let mut u: Vector<i32> = Vector::from([1, 2]);
+        let mut u: Vector<i32> = Vector::from([0, 0]);
         u.scl(0);
         assert_eq!(u, Vector::from([0, 0]));
     }
@@ -493,6 +521,13 @@ mod tests {
         let mut u: Vector<i32> = Vector::from([]);
         u.scl(1);
         assert_eq!(u, Vector::from([]));
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_scalar_i32_panic_overflow() {
+        let mut u: Vector<i32> = Vector::from([i32::MAX]);
+        u.scl(2);
     }
 
     // Linear combination f32
@@ -505,9 +540,15 @@ mod tests {
         let v1 = Vector::from([1., 2., 3.]);
         let v2 = Vector::from([0., 10., -100.]);
 
-        assert_eq!(linear_combination(&[e1, e2, e3], &[10., -2., 0.5]), Vector::from([10., -2., 0.5]));
+        assert_eq!(
+            linear_combination(&[e1, e2, e3], &[10., -2., 0.5]),
+            Vector::from([10., -2., 0.5])
+        );
 
-        assert_eq!(linear_combination(&[v1, v2], &[10., -2.]), Vector::from([10., 0., 230.]));
+        assert_eq!(
+            linear_combination(&[v1, v2], &[10., -2.]),
+            Vector::from([10., 0., 230.])
+        );
     }
 
     #[test]
@@ -516,7 +557,10 @@ mod tests {
         let e2 = Vector::from([0., 0., 0.]);
         let e3 = Vector::from([0., 0., 0.]);
 
-        assert_eq!(linear_combination(&[e1, e2, e3], &[0., 0., 0.]), Vector::from([0., 0., 0.]));
+        assert_eq!(
+            linear_combination(&[e1, e2, e3], &[0., 0., 0.]),
+            Vector::from([0., 0., 0.])
+        );
     }
 
     // #[test]
@@ -596,8 +640,6 @@ mod tests {
         u.dot(&v);
     }
 
-    // Test overflow
-
     // Angle cos f32
     #[test]
     fn test_angle_cos_f32_basic() {
@@ -637,7 +679,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "undefined for zero vectors")]
     fn test_angle_cos_f32_panic_zero() {
-        let v: Vector<f32> = Vector::from([0., 0.]);
+        let v: Vector<f32> = Vector::from([1., 2.]);
         let u: Vector<f32> = Vector::from([0., 0.]);
         angle_cos(&u, &v);
     }
@@ -654,7 +696,7 @@ mod tests {
         assert_eq!(angle_cos(&u, &v), 0.);
 
         let u: Vector<i16> = Vector::from([-1, 1]);
-        let v: Vector<i16> = Vector::from([ 1, -1]);
+        let v: Vector<i16> = Vector::from([1, -1]);
         assert!(approx_eq(angle_cos(&u, &v), -1.));
 
         let u: Vector<i16> = Vector::from([2, 1]);
@@ -681,7 +723,7 @@ mod tests {
     #[test]
     #[should_panic(expected = "undefined for zero vectors")]
     fn test_angle_cos_i16_panic_zero() {
-        let v: Vector<i16> = Vector::from([0, 0]);
+        let v: Vector<i16> = Vector::from([1, 2]);
         let u: Vector<i16> = Vector::from([0, 0]);
         angle_cos(&u, &v);
     }
@@ -704,6 +746,10 @@ mod tests {
 
     #[test]
     fn test_cross_product_f32_zero() {
+        let u: Vector<f32> = Vector::from([1., 2., 3.]);
+        let v: Vector<f32> = Vector::from([0., 0., 0.]);
+        assert_eq!(cross_product(&u, &v), Vector::from([0., 0., 0.]));
+
         let u: Vector<f32> = Vector::from([0., 0., 0.]);
         let v: Vector<f32> = Vector::from([0., 0., 0.]);
         assert_eq!(cross_product(&u, &v), Vector::from([0., 0., 0.]));
@@ -751,6 +797,10 @@ mod tests {
 
     #[test]
     fn test_cross_product_i32_zero() {
+        let u: Vector<i32> = Vector::from([1, 2, 3]);
+        let v: Vector<i32> = Vector::from([0, 0, 0]);
+        assert_eq!(cross_product(&u, &v), Vector::from([0, 0, 0]));
+
         let u: Vector<i32> = Vector::from([0, 0, 0]);
         let v: Vector<i32> = Vector::from([0, 0, 0]);
         assert_eq!(cross_product(&u, &v), Vector::from([0, 0, 0]));

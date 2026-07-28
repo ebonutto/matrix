@@ -1,5 +1,5 @@
 use std::fmt;
-use std::ops::{Index, IndexMut};
+use std::ops::{AddAssign, Index, IndexMut, MulAssign, SubAssign};
 
 // Structure
 #[derive(Debug, PartialEq)]
@@ -9,7 +9,7 @@ pub struct Matrix<K> {
     cols: usize,
 }
 
-// Constructors
+// Getters
 impl<K> Matrix<K> {
     pub fn rows(&self) -> usize {
         self.rows
@@ -50,6 +50,7 @@ impl<K, const R: usize, const C: usize> From<[[K; C]; R]> for Matrix<K> {
     }
 }
 
+// Display
 impl<K: fmt::Display> fmt::Display for Matrix<K> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for row in 0..self.rows {
@@ -70,6 +71,7 @@ impl<K: fmt::Display> fmt::Display for Matrix<K> {
     }
 }
 
+// Index
 impl<K> Index<(usize, usize)> for Matrix<K> {
     type Output = K;
 
@@ -86,9 +88,10 @@ impl<K> IndexMut<(usize, usize)> for Matrix<K> {
     }
 }
 
+// Addition
 impl<K> Matrix<K>
 where
-    K: Copy + std::ops::AddAssign,
+    K: Copy + AddAssign,
 {
     pub fn add(&mut self, v: &Matrix<K>) {
         assert_eq!(
@@ -105,9 +108,10 @@ where
     }
 }
 
+// Substraction
 impl<K> Matrix<K>
 where
-    K: Copy + std::ops::SubAssign,
+    K: Copy + SubAssign,
 {
     pub fn sub(&mut self, v: &Matrix<K>) {
         assert_eq!(
@@ -124,9 +128,10 @@ where
     }
 }
 
+// Scalar
 impl<K> Matrix<K>
 where
-    K: Copy + std::ops::MulAssign,
+    K: Copy + MulAssign,
 {
     pub fn scl(&mut self, a: K) {
         for x in self.data.iter_mut() {
@@ -134,6 +139,31 @@ where
         }
     }
 }
+
+// // Trace
+// impl<K> Matrix<K>
+// where
+//     K: Copy + Default + AddAssign,
+// {
+//     fn trace(&self) -> K {
+//         assert!(self.is_square(), "Matrix::trace: matrix must be square");
+
+//         let mut sum = K::default();
+
+//         for i in 0..self.rows {
+//             sum += self[(i, i)];
+//         }
+
+//         sum
+//     }
+// }
+
+// // Transpose
+// impl<K> Matrix<K> {
+//     fn transpose(&mut self) -> Matrix<K> {
+
+//     }
+// }
 
 #[cfg(test)]
 mod tests {
@@ -322,4 +352,6 @@ mod tests {
         u.scl(1);
         assert_eq!(u, Matrix::from([[]]));
     }
+
+    // Multiplication vector f32
 }
