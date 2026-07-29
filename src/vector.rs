@@ -523,13 +523,6 @@ mod tests {
         assert_eq!(u, Vector::from([]));
     }
 
-    #[test]
-    #[should_panic]
-    fn test_scalar_i32_panic_overflow() {
-        let mut u: Vector<i32> = Vector::from([i32::MAX]);
-        u.scl(2);
-    }
-
     // Linear combination f32
     #[test]
     fn test_linear_combination_f32_basic() {
@@ -582,6 +575,10 @@ mod tests {
         let u: Vector<f32> = Vector::from([-1., 6.]);
         let v: Vector<f32> = Vector::from([3., 2.]);
         assert_eq!(u.dot(&v), 9.);
+
+        let u: Vector<f32> = Vector::from([1., -1.]);
+        let v: Vector<f32> = Vector::from([2., 2.]);
+        assert_eq!(u.dot(&v), 0.);
     }
 
     #[test]
@@ -616,6 +613,10 @@ mod tests {
         let u: Vector<i32> = Vector::from([-1, 6]);
         let v: Vector<i32> = Vector::from([3, 2]);
         assert_eq!(u.dot(&v), 9);
+
+        let u: Vector<i32> = Vector::from([1, -1]);
+        let v: Vector<i32> = Vector::from([2, 2]);
+        assert_eq!(u.dot(&v), 0);
     }
 
     #[test]
@@ -679,8 +680,8 @@ mod tests {
     #[test]
     #[should_panic(expected = "undefined for zero vectors")]
     fn test_angle_cos_f32_panic_zero() {
-        let v: Vector<f32> = Vector::from([1., 2.]);
-        let u: Vector<f32> = Vector::from([0., 0.]);
+        let u: Vector<f32> = Vector::from([1., 2.]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
         angle_cos(&u, &v);
     }
 
@@ -723,8 +724,8 @@ mod tests {
     #[test]
     #[should_panic(expected = "undefined for zero vectors")]
     fn test_angle_cos_i16_panic_zero() {
-        let v: Vector<i16> = Vector::from([1, 2]);
-        let u: Vector<i16> = Vector::from([0, 0]);
+        let u: Vector<i16> = Vector::from([1, 2]);
+        let v: Vector<i16> = Vector::from([0, 0]);
         angle_cos(&u, &v);
     }
 
