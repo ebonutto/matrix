@@ -180,6 +180,11 @@ mod tests {
 
     #[test]
     fn test_addition_f32_zero() {
+        let mut u: Matrix<f32> = Matrix::from([[1., 2.], [3., 4.]]);
+        let v: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[1., 2.], [3., 4.]]));
+
         let mut u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
         let v: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
         u.add(&v);
@@ -213,6 +218,11 @@ mod tests {
 
     #[test]
     fn test_addition_i32_zero() {
+        let mut u: Matrix<i32> = Matrix::from([[1, 2], [3, 4]]);
+        let v: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[1, 2], [3, 4]]));
+
         let mut u: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
         let v: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
         u.add(&v);
@@ -246,6 +256,11 @@ mod tests {
 
     #[test]
     fn test_substraction_f32_zero() {
+        let mut u: Matrix<f32> = Matrix::from([[1., 2.], [3., 4.]]);
+        let v: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        u.sub(&v);
+        assert_eq!(u, Matrix::from([[1., 2.], [3., 4.]]));
+
         let mut u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
         let v: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
         u.sub(&v);
@@ -279,6 +294,11 @@ mod tests {
 
     #[test]
     fn test_substraction_i32_zero() {
+        let mut u: Matrix<i32> = Matrix::from([[1, 2], [3, 4]]);
+        let v: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
+        u.add(&v);
+        assert_eq!(u, Matrix::from([[1, 2], [3, 4]]));
+
         let mut u: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
         let v: Matrix<i32> = Matrix::from([[0, 0], [0, 0]]);
         u.sub(&v);
