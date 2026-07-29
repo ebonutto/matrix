@@ -16,7 +16,7 @@ impl<K> Matrix<K> {
     /// Creates a matrix filled with K::default()
     pub fn new(rows: usize, cols: usize) -> Self
     where
-        K: Default,
+        K: Clone + Default,
     {
         Self {
             data: vec![K::default(); rows * cols],
@@ -185,8 +185,8 @@ where
             self.cols,
             vec.size(),
             "Matrix::mul_vec: shape mismatch ({} vs {})",
-            self.shape(),
-            mat.shape()
+            self.cols(),
+            vec.size()
         );
 
         let mut result = vec![K::default(); self.rows];
@@ -204,7 +204,7 @@ where
         assert_eq!(
             self.cols,
             mat.rows,
-            "Matrix::mul_mat: shape mismatch ({} vs {})",
+            "Matrix::mul_mat: shape mismatch ({:?} vs {:?})",
             self.shape(),
             mat.shape()
         );
