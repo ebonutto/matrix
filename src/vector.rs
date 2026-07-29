@@ -526,18 +526,16 @@ mod tests {
     // Linear combination f32
     #[test]
     fn test_linear_combination_f32_basic() {
-        let e1 = Vector::from([1., 0., 0.]);
-        let e2 = Vector::from([0., 1., 0.]);
-        let e3 = Vector::from([0., 0., 1.]);
-
-        let v1 = Vector::from([1., 2., 3.]);
-        let v2 = Vector::from([0., 10., -100.]);
-
+        let e1: Vector<f32> = Vector::from([1., 0., 0.]);
+        let e2: Vector<f32> = Vector::from([0., 1., 0.]);
+        let e3: Vector<f32> = Vector::from([0., 0., 1.]);
         assert_eq!(
             linear_combination(&[e1, e2, e3], &[10., -2., 0.5]),
             Vector::from([10., -2., 0.5])
         );
 
+        let v1: Vector<f32> = Vector::from([1., 2., 3.]);
+        let v2: Vector<f32> = Vector::from([0., 10., -100.]);
         assert_eq!(
             linear_combination(&[v1, v2], &[10., -2.]),
             Vector::from([10., 0., 230.])
@@ -549,7 +547,6 @@ mod tests {
         let e1 = Vector::from([0., 0., 0.]);
         let e2 = Vector::from([0., 0., 0.]);
         let e3 = Vector::from([0., 0., 0.]);
-
         assert_eq!(
             linear_combination(&[e1, e2, e3], &[0., 0., 0.]),
             Vector::from([0., 0., 0.])
@@ -557,10 +554,57 @@ mod tests {
     }
 
     // #[test]
-    // fn test_linear_combination_f32_empty() {
-    //     let u: Vector<f32> = Vector::from([]);
-    //     let v: Vector<f32> = Vector::from([]);
-    //     assert_eq!(linear_combination(&[e1, e2, e3], &[0., 0., 0.]), Vector::from([0., 0., 0.]));
+    // #[should_panic]
+    // fn test_linear_combination_f32_panic_empty() {
+    //     let e1: Vector<f32> = Vector::from([]);
+    //     let e2: Vector<f32> = Vector::from([]);
+    //     let e3: Vector<f32> = Vector::from([]);
+    //     assert_eq!(
+    //         linear_combination(&[e1, e2, e3], &[0., 0., 0.]),
+    //         Vector::from([0., 0., 0.])
+    //     );
+    // }
+
+    // Linear combination i32
+    #[test]
+    fn test_linear_combination_i32_basic() {
+        let e1: Vector<i32> = Vector::from([1, 0, 0]);
+        let e2: Vector<i32> = Vector::from([0, 1, 0]);
+        let e3: Vector<i32> = Vector::from([0, 0, 1]);
+        assert_eq!(
+            linear_combination(&[e1, e2, e3], &[10, -2, 05]),
+            Vector::from([10, -2, 05])
+        );
+
+        let v1: Vector<i32> = Vector::from([1, 2, 3]);
+        let v2: Vector<i32> = Vector::from([0, 10, -100]);
+        assert_eq!(
+            linear_combination(&[v1, v2], &[10, -2]),
+            Vector::from([10, 0, 230])
+        );
+    }
+
+    #[test]
+    fn test_linear_combination_i32_zero() {
+        let e1 = Vector::from([0, 0, 0]);
+        let e2 = Vector::from([0, 0, 0]);
+        let e3 = Vector::from([0, 0, 0]);
+        assert_eq!(
+            linear_combination(&[e1, e2, e3], &[0, 0, 0]),
+            Vector::from([0, 0, 0])
+        );
+    }
+
+    // #[test]
+    // #[should_panic]
+    // fn test_linear_combination_i32_panic_empty() {
+    //     let e1: Vector<i32> = Vector::from([]);
+    //     let e2: Vector<i32> = Vector::from([]);
+    //     let e3: Vector<i32> = Vector::from([]);
+    //     assert_eq!(
+    //         linear_combination(&[e1, e2, e3], &[0., 0., 0.]),
+    //         Vector::from([0., 0., 0.])
+    //     );
     // }
 
     // Linear interpolation
@@ -758,7 +802,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "undefined for non-three-dimensional vectors")]
-    fn test_cross_product_f32_empty() {
+    fn test_cross_product_f32_panic_empty() {
         let u: Vector<f32> = Vector::from([]);
         let v: Vector<f32> = Vector::from([]);
         cross_product(&u, &v);
@@ -809,7 +853,7 @@ mod tests {
 
     #[test]
     #[should_panic(expected = "undefined for non-three-dimensional vectors")]
-    fn test_cross_product_i32_empty() {
+    fn test_cross_product_i32_panic_empty() {
         let u: Vector<i32> = Vector::from([]);
         let v: Vector<i32> = Vector::from([]);
         cross_product(&u, &v);
