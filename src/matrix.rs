@@ -1,5 +1,7 @@
+use crate::Vector;
+
 use std::fmt;
-use std::ops::{AddAssign, Index, IndexMut, MulAssign, SubAssign};
+use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, SubAssign};
 
 // Structure
 #[derive(Debug, PartialEq)]
@@ -7,6 +9,41 @@ pub struct Matrix<K> {
     data: Vec<K>,
     rows: usize,
     cols: usize,
+}
+
+// Constructors
+impl<K> Matrix<K> {
+    /// Creates a matrix filled with K::default()
+    pub fn new(rows: usize, cols: usize) -> Self
+    where
+        K: Default,
+    {
+        Self {
+            data: vec![K::default(); rows * cols],
+            rows,
+            cols,
+        }
+    }
+
+//     /// Creates an empty matrix (0 x 0)
+//     pub fn empty() -> Self {
+//         Self {
+//             data: Vec::new(),
+//             rows: 0,
+//             cols: 0,
+//         }
+//     }
+
+//     pub fn filled(rows: usize, cols: usize, value: K) -> Self
+//     where
+//         K: Clone,
+//     {
+//         Self {
+//             data: vec![value; rows * cols],
+//             rows,
+//             cols,
+//         }
+//     }
 }
 
 // Getters
@@ -76,14 +113,12 @@ impl<K> Index<(usize, usize)> for Matrix<K> {
     type Output = K;
 
     fn index(&self, (row, col): (usize, usize)) -> &Self::Output {
-        debug_assert!(row < self.rows && col < self.cols, "index out of bounds"); // FUCK
         &self.data[row * self.cols + col]
     }
 }
 
 impl<K> IndexMut<(usize, usize)> for Matrix<K> {
     fn index_mut(&mut self, (row, col): (usize, usize)) -> &mut Self::Output {
-        debug_assert!(row < self.rows && col < self.cols, "index out of bounds"); // FUCK
         &mut self.data[row * self.cols + col]
     }
 }
@@ -140,23 +175,75 @@ where
     }
 }
 
-// // Trace
-// impl<K> Matrix<K>
-// where
-//     K: Copy + Default + AddAssign,
-// {
-//     fn trace(&self) -> K {
-//         assert!(self.is_square(), "Matrix::trace: matrix must be square");
+// Multiplication
+impl<K> Matrix<K>
+where
+    K: Copy + Default + AddAssign + Mul<Output = K>,
+{
+    pub fn mul_vec(&self, vec: &Vector<K>) -> Vector<K> {
+        assert_eq!(
+            self.cols,
+            vec.size(),
+            "Matrix::mul_vec: shape mismatch ({} vs {})",
+            self.shape(),
+            mat.shape()
+        );
 
-//         let mut sum = K::default();
+        let mut result = vec![K::default(); self.rows];
 
-//         for i in 0..self.rows {
-//             sum += self[(i, i)];
-//         }
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                result[i] += self[(i, j)] * vec[j];
+            }
+        }
 
-//         sum
-//     }
-// }
+        Vector::from(result)
+    }
+
+    pub fn mul_mat(&self, mat: &Matrix<K>) -> Matrix<K> {
+        assert_eq!(
+            self.cols,
+            mat.rows,
+            "Matrix::mul_mat: shape mismatch ({} vs {})",
+            self.shape(),
+            mat.shape()
+        );
+
+        let mut result = Matrix::new(self.rows, mat.cols);
+
+        for i in 0..self.rows {
+            for j in 0..mat.cols {
+                for k in 0..self.cols {
+                    result[(i, j)] += self[(i, k)] * mat[(k, j)];
+                }
+            }
+        }
+
+        result
+    }
+}
+
+// Trace
+impl<K> Matrix<K>
+where
+    K: Copy + Default + AddAssign,
+{
+    pub fn trace(&self) -> K {
+        assert!(
+            self.is_square(),
+            "Matrix::trace: undefined for non-square matrix ({:?})",
+            self.shape()
+        );
+
+        let mut sum = K::default();
+
+        for i in 0..self.rows {
+            sum += self[(i, i)];
+        }
+
+        sum
+    }
+}
 
 // // Transpose
 // impl<K> Matrix<K> {
@@ -374,4 +461,71 @@ mod tests {
     }
 
     // Multiplication vector f32
+    #[test]
+    fn test_multiplication_vector_f32_basic() {
+        let u: Matrix<f32> = Matrix::from([[1., 0.], [0., 1.]]);
+        let v: Vector<f32> = Vector::from([4., 2.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([4., 2.]));
+
+        let u: Matrix<f32> = Matrix::from([[2., 0.], [0., 2.]]);
+        let v: Vector<f32> = Vector::from([4., 2.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([8., 4.]));
+
+        let u: Matrix<f32> = Matrix::from([[2., -2.], [-2., 2.]]);
+        let v: Vector<f32> = Vector::from([4., 2.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([4., -4.]));
+    }
+
+    #[test]
+    fn test_multiplication_vector_f32_zero() {
+        let u: Matrix<f32> = Matrix::from([[1., 2.], [3., 14.]]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([0., 0.]));
+
+        let u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([0., 0.]));
+    }
+
+    #[test]
+    fn test_multiplication_vector_f32_empty() {
+        let u: Matrix<f32> = Matrix::from([[]]);
+        let v: Vector<f32> = Vector::from([]);
+        assert_eq!(u.mul_vec(&v), Vector::from([]));
+    }
+
+    // Trace f32
+    #[test]
+    fn test_trace_f32_basic() {
+        let u: Matrix<f32> = Matrix::from([[1., 0.], [0., 1.]]);
+        assert_eq!(u.trace(), 2.);
+
+        let u: Matrix<f32> = Matrix::from([[2., -5., 0.], [4., 3., 7.], [-2., 3., 4.]]);
+        assert_eq!(u.trace(), 9.);
+
+        let u: Matrix<f32> = Matrix::from([[-2., -8., 4.], [1., -23., 4.], [0., 6., 4.]]);
+        assert_eq!(u.trace(), -21.);
+    }
+
+    #[test]
+    fn test_trace_f32_zero() {
+        let u: Matrix<f32> = Matrix::from([[0., 1., 1.], [1., 0., 1.], [1., 1., 0.]]);
+        assert_eq!(u.trace(), 0.);
+
+        let u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        assert_eq!(u.trace(), 0.);
+    }
+
+    // #[test]
+    // fn test_trace_f32_empty() {
+    //     let u: Matrix<f32> = Matrix::from([[]]);
+    //     assert_eq!(u.trace(), 0.);
+    // }
+
+    // #[test]
+    // #[should_panic]
+    // fn test_trace_f32_panic_non_squared() {
+    //     let u: Matrix<f32> = Matrix::from([[]]);
+    //     assert_eq!(u.trace(), 0.);
+    // }
 }
