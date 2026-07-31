@@ -62,17 +62,31 @@ impl<K: fmt::Display> fmt::Display for Matrix<K> {
     }
 }
 
-// Index //! Index out of bounds
+// Index
 impl<K> Index<(usize, usize)> for Matrix<K> {
     type Output = K;
 
     fn index(&self, (row, col): (usize, usize)) -> &Self::Output {
+        debug_assert!(
+            i < self.data.len(),
+            "Matrix::index: index {} out of bounds (size {})",
+            i,
+            self.data.len()
+        );
+
         &self.data[row * self.cols + col]
     }
 }
 
 impl<K> IndexMut<(usize, usize)> for Matrix<K> {
     fn index_mut(&mut self, (row, col): (usize, usize)) -> &mut Self::Output {
+        debug_assert!(
+            i < self.data.len(),
+            "Matrix::index_mut: index {} out of bounds (size {})",
+            i,
+            self.data.len()
+        );
+
         &mut self.data[row * self.cols + col]
     }
 }
@@ -199,9 +213,36 @@ where
     }
 }
 
-// // Transpose
+// Transpose
+impl<K> Matrix<K>
+where
+    K: Copy + Default,
+{
+    pub fn transpose(&self) -> Matrix<K> {
+        let mut result = Matrix {
+            data: vec![K::default(); self.cols * self.rows],
+            rows: self.cols,
+            cols: self.rows,
+        };
+
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                result[(j, i)] = self[(i, j)];
+            }
+        }
+
+        result
+    }
+}
+
 // impl<K> Matrix<K> {
-//     fn transpose(&mut self) -> Matrix<K> {
+//     fn row_echelon<K>(&mut self) -> Matrix<K> {
+        
+//     }
+// }
+
+// impl<K> Matrix<K> {
+//     pub fn determinant(&self) -> K {
 
 //     }
 // }
