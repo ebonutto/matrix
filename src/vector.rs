@@ -131,16 +131,22 @@ where
         u.len(),
         coefs.len()
     );
-    assert!(!u.is_empty(), "linear_combination: empty input");
+
+    if u.is_empty() {
+        return Vector::from(Vec::new());
+    }
 
     let n = u[0].size();
     let mut result = vec![K::default(); n];
 
-    for (vector, &coef) in u.iter().zip(coefs.iter()) {
+    for (i, (vector, &coef)) in u.iter().zip(coefs.iter()).enumerate() {
         assert_eq!(
             vector.size(),
             n,
-            "linear_combination: inconsistent vector sizes"
+            "linear_combination: vector at index {} has size {} but expected {} (based on vector 0)",
+            i,
+            vector.size(),
+            n
         );
 
         for (r, &x) in result.iter_mut().zip(vector.data.iter()) {
@@ -412,26 +418,58 @@ mod tests {
 
     #[test]
     fn test_linear_combination_f32_zero() {
-        let e1 = Vector::from([0., 0., 0.]);
-        let e2 = Vector::from([0., 0., 0.]);
-        let e3 = Vector::from([0., 0., 0.]);
+        let e1: Vector<f32> = Vector::from([1., 2., 3.]);
+        let e2: Vector<f32> = Vector::from([4., 5., 6.]);
+        let e3: Vector<f32> = Vector::from([7., 8., 9.]);
+        assert_eq!(
+            linear_combination(&[e1, e2, e3], &[0., 0., 0.]),
+            Vector::from([0., 0., 0.])
+        );
+
+        let e1: Vector<f32> = Vector::from([0., 0., 0.]);
+        let e2: Vector<f32> = Vector::from([0., 0., 0.]);
+        let e3: Vector<f32> = Vector::from([0., 0., 0.]);
         assert_eq!(
             linear_combination(&[e1, e2, e3], &[0., 0., 0.]),
             Vector::from([0., 0., 0.])
         );
     }
 
-    // #[test]
-    // #[should_panic]
-    // fn test_linear_combination_f32_panic_empty() {
-    //     let e1: Vector<f32> = Vector::from([]);
-    //     let e2: Vector<f32> = Vector::from([]);
-    //     let e3: Vector<f32> = Vector::from([]);
-    //     assert_eq!(
-    //         linear_combination(&[e1, e2, e3], &[0., 0., 0.]),
-    //         Vector::from([0., 0., 0.])
-    //     );
-    // }
+    #[test]
+    fn test_linear_combination_f32_empty() {
+        let e1: Vector<f32> = Vector::from([]);
+        let e2: Vector<f32> = Vector::from([]);
+        let e3: Vector<f32> = Vector::from([]);
+        assert_eq!(
+            linear_combination(&[e1, e2, e3], &[1., 2., 3.]),
+            Vector::from([])
+        );
+
+        let empty_vectors: [Vector<f32>; 0] = [];
+        let empty_coefs: [f32; 0] = [];
+        assert_eq!(
+            linear_combination(&empty_vectors, &empty_coefs),
+            Vector::from([])
+        );
+    }
+
+    #[test]
+    #[should_panic(expected = "vectors but")]
+    fn test_linear_combination_f32_panic_length_mismatch() {
+        let e1: Vector<f32> = Vector::from([1., 2., 3.]);
+        let e2: Vector<f32> = Vector::from([4., 5., 6.]);
+        let e3: Vector<f32> = Vector::from([7., 8., 9.]);
+        linear_combination(&[e1, e2, e3], &[1., 2.]);
+    }
+
+    #[test]
+    #[should_panic(expected = "but expected")]
+    fn test_linear_combination_f32_panic_inconsistent_size() {
+        let e1: Vector<f32> = Vector::from([1., 2., 3.]);
+        let e2: Vector<f32> = Vector::from([4., 5., 6.]);
+        let e3: Vector<f32> = Vector::from([7., 8.]);
+        linear_combination(&[e1, e2, e3], &[1., 2., 3.]);
+    }
 
     // Linear interpolation
 
