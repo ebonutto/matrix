@@ -69,7 +69,7 @@ impl<K: fmt::Display> fmt::Display for Vector<K> {
     }
 }
 
-// Arithmetic
+// Addition
 impl<K> Vector<K>
 where
     K: Copy + AddAssign,
@@ -89,6 +89,7 @@ where
     }
 }
 
+// Substraction
 impl<K> Vector<K>
 where
     K: Copy + SubAssign,
@@ -108,6 +109,7 @@ where
     }
 }
 
+// Scalar
 impl<K> Vector<K>
 where
     K: Copy + MulAssign,
