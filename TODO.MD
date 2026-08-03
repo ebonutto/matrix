@@ -1,10 +1,6 @@
 
 # Tests
 
-Vector :
-- [X] EX01: Linear combination
-    - [] Re-do it
-    - [] Add panic tests
 - [] EX02: Linear interpolation
 
 Matrix : 
@@ -16,3 +12,5 @@ Matrix :
  - [] mat
 [X] Ex08 : trace
     - [] Handle Errors
+[] Ex09: Transpose
+
