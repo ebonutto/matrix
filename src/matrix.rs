@@ -67,6 +67,8 @@ impl<K> Index<(usize, usize)> for Matrix<K> {
     type Output = K;
 
     fn index(&self, (row, col): (usize, usize)) -> &Self::Output {
+        let i: usize = row * self.cols + col;
+
         debug_assert!(
             i < self.data.len(),
             "Matrix::index: index {} out of bounds (size {})",
@@ -74,12 +76,14 @@ impl<K> Index<(usize, usize)> for Matrix<K> {
             self.data.len()
         );
 
-        &self.data[row * self.cols + col]
+        &self.data[i]
     }
 }
 
 impl<K> IndexMut<(usize, usize)> for Matrix<K> {
     fn index_mut(&mut self, (row, col): (usize, usize)) -> &mut Self::Output {
+        let i: usize = row * self.cols + col;
+
         debug_assert!(
             i < self.data.len(),
             "Matrix::index_mut: index {} out of bounds (size {})",
@@ -87,7 +91,7 @@ impl<K> IndexMut<(usize, usize)> for Matrix<K> {
             self.data.len()
         );
 
-        &mut self.data[row * self.cols + col]
+        &mut self.data[i]
     }
 }
 
@@ -182,7 +186,7 @@ where
 //         for i in 0..self.rows {
 //             for j in 0..mat.cols {
 //                 for k in 0..self.cols {
-//                     result[(i, j)] += self[(i, k)] * mat[(k, j)];
+//                     result[] += self[(i, k)] * mat[(k, j)];
 //                 }
 //             }
 //         }
@@ -236,15 +240,14 @@ where
 }
 
 // impl<K> Matrix<K> {
-//     fn row_echelon<K>(&mut self) -> Matrix<K> {
-        
+//     fn row_echelon<K>(&self) -> Matrix<K> {
+//         let mut result = vec![K::default(); self.rows];
+
 //     }
 // }
 
 // impl<K> Matrix<K> {
-//     pub fn determinant(&self) -> K {
-
-//     }
+//     pub fn determinant(&self) -> K {}
 // }
 
 #[cfg(test)]
