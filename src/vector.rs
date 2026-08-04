@@ -7,6 +7,18 @@ pub struct Vector<K> {
     data: Vec<K>,
 }
 
+// Constructors
+impl<K> Vector<K>
+where
+    K: Default + Copy,
+{
+    pub fn zeros(size: usize) -> Self {
+        Self {
+            data: vec![K::default(); size],
+        }
+    }
+}
+
 // Getters
 impl<K> Vector<K> {
     pub fn size(&self) -> usize {
