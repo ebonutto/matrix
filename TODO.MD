@@ -10,7 +10,8 @@ Matrix :
 [] Ex07 : mul
  - [X] Vec
  - [] mat
+ - [] Create constructor new for Matrix and Vector
 [X] Ex08 : trace
-    - [] Handle Errors
+    - [X] Handle Errors
 [] Ex09: Transpose
 
