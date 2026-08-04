@@ -11,6 +11,20 @@ pub struct Matrix<K> {
     cols: usize,
 }
 
+// Constructors
+impl<K> Matrix<K>
+where
+    K: Copy + Default,
+{
+    pub fn zeros(rows: usize, cols: usize) -> Self {
+        Self {
+            data: vec![K::default(); rows * cols],
+            rows,
+            cols,
+        }
+    }
+}
+
 // Getters
 impl<K> Matrix<K> {
     pub fn rows(&self) -> usize {
@@ -147,53 +161,53 @@ where
     }
 }
 
-// // Multiplication
-// impl<K> Matrix<K>
-// where
-//     K: Copy + Default + AddAssign + Mul<Output = K>,
-// {
-//     pub fn mul_vec(&self, vec: &Vector<K>) -> Vector<K> {
-//         assert_eq!(
-//             self.cols,
-//             vec.size(),
-//             "Matrix::mul_vec: shape mismatch ({} vs {})",
-//             self.cols(),
-//             vec.size()
-//         );
+// Multiplication
+impl<K> Matrix<K>
+where
+    K: Copy + Default + AddAssign + Mul<Output = K>,
+{
+    pub fn mul_vec(&self, vec: &Vector<K>) -> Vector<K> {
+        assert_eq!(
+            self.cols,
+            vec.size(),
+            "Matrix::mul_vec: shape mismatch ({} vs {})",
+            self.cols(),
+            vec.size()
+        );
 
-//         let mut result = vec![K::default(); self.rows];
+        let mut result = Vector::zeros(self.rows);
 
-//         for i in 0..self.rows {
-//             for j in 0..self.cols {
-//                 result[i] += self[(i, j)] * vec[j];
-//             }
-//         }
+        for i in 0..self.rows {
+            for j in 0..self.cols {
+                result[i] += self[(i, j)] * vec[j];
+            }
+        }
 
-//         Vector::from(result)
-//     }
+        result
+    }
 
-//     pub fn mul_mat(&self, mat: &Matrix<K>) -> Matrix<K> {
-//         assert_eq!(
-//             self.cols,
-//             mat.rows,
-//             "Matrix::mul_mat: shape mismatch ({:?} vs {:?})",
-//             self.shape(),
-//             mat.shape()
-//         );
+    pub fn mul_mat(&self, mat: &Matrix<K>) -> Matrix<K> {
+        assert_eq!(
+            self.cols,
+            mat.rows,
+            "Matrix::mul_mat: shape mismatch ({:?} vs {:?})",
+            self.shape(),
+            mat.shape()
+        );
 
-//         let mut result = vec![K::default(); self.rows];
+        let mut result = Matrix::zeros(self.rows, mat.cols);
 
-//         for i in 0..self.rows {
-//             for j in 0..mat.cols {
-//                 for k in 0..self.cols {
-//                     result[] += self[(i, k)] * mat[(k, j)];
-//                 }
-//             }
-//         }
+        for i in 0..self.rows {
+            for j in 0..mat.cols {
+                for k in 0..self.cols {
+                    result[(i, j)] += self[(i, k)] * mat[(k, j)];
+                }
+            }
+        }
 
-//         Matrresult
-//     }
-// }
+        result
+    }
+}
 
 // Trace
 impl<K> Matrix<K>
@@ -356,39 +370,39 @@ mod tests {
         assert_eq!(u, Matrix::from([[]]));
     }
 
-    // // Multiplication vector f32
-    // #[test]
-    // fn test_multiplication_vector_f32_basic() {
-    //     let u: Matrix<f32> = Matrix::from([[1., 0.], [0., 1.]]);
-    //     let v: Vector<f32> = Vector::from([4., 2.]);
-    //     assert_eq!(u.mul_vec(&v), Vector::from([4., 2.]));
+    // Multiplication vector f32
+    #[test]
+    fn test_multiplication_vector_f32_basic() {
+        let u: Matrix<f32> = Matrix::from([[1., 0.], [0., 1.]]);
+        let v: Vector<f32> = Vector::from([4., 2.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([4., 2.]));
 
-    //     let u: Matrix<f32> = Matrix::from([[2., 0.], [0., 2.]]);
-    //     let v: Vector<f32> = Vector::from([4., 2.]);
-    //     assert_eq!(u.mul_vec(&v), Vector::from([8., 4.]));
+        let u: Matrix<f32> = Matrix::from([[2., 0.], [0., 2.]]);
+        let v: Vector<f32> = Vector::from([4., 2.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([8., 4.]));
 
-    //     let u: Matrix<f32> = Matrix::from([[2., -2.], [-2., 2.]]);
-    //     let v: Vector<f32> = Vector::from([4., 2.]);
-    //     assert_eq!(u.mul_vec(&v), Vector::from([4., -4.]));
-    // }
+        let u: Matrix<f32> = Matrix::from([[2., -2.], [-2., 2.]]);
+        let v: Vector<f32> = Vector::from([4., 2.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([4., -4.]));
+    }
 
-    // #[test]
-    // fn test_multiplication_vector_f32_zero() {
-    //     let u: Matrix<f32> = Matrix::from([[1., 2.], [3., 14.]]);
-    //     let v: Vector<f32> = Vector::from([0., 0.]);
-    //     assert_eq!(u.mul_vec(&v), Vector::from([0., 0.]));
+    #[test]
+    fn test_multiplication_vector_f32_zero() {
+        let u: Matrix<f32> = Matrix::from([[1., 2.], [3., 14.]]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([0., 0.]));
 
-    //     let u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
-    //     let v: Vector<f32> = Vector::from([0., 0.]);
-    //     assert_eq!(u.mul_vec(&v), Vector::from([0., 0.]));
-    // }
+        let u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        let v: Vector<f32> = Vector::from([0., 0.]);
+        assert_eq!(u.mul_vec(&v), Vector::from([0., 0.]));
+    }
 
-    // #[test]
-    // fn test_multiplication_vector_f32_empty() {
-    //     let u: Matrix<f32> = Matrix::from([[]]);
-    //     let v: Vector<f32> = Vector::from([]);
-    //     assert_eq!(u.mul_vec(&v), Vector::from([]));
-    // }
+    #[test]
+    fn test_multiplication_vector_f32_empty() {
+        let u: Matrix<f32> = Matrix::from([] as [[f32; 0]; 0]);
+        let v: Vector<f32> = Vector::from([]);
+        assert_eq!(u.mul_vec(&v), Vector::from([]));
+    }
 
     // Trace f32
     #[test]
