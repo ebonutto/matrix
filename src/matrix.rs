@@ -166,7 +166,8 @@ impl<K> Matrix<K>
 where
     K: Copy + Default + AddAssign + Mul<Output = K>,
 {
-    pub fn mul_vec(&self, vec: &Vector<K>) -> Vector<K> { //! Change error message
+    pub fn mul_vec(&self, vec: &Vector<K>) -> Vector<K> {
+        //! Change error message
         assert_eq!(
             self.cols,
             vec.size(),
@@ -470,5 +471,36 @@ mod tests {
     fn test_trace_f32_panic_non_squared() {
         let u: Matrix<f32> = Matrix::from([[1., 2.]]);
         assert_eq!(u.trace(), 0.);
+    }
+
+    // Transpose f32
+    #[test]
+    fn test_transpose_f32_basic() {
+        let u: Matrix<f32> = Matrix::from([[1., 0.], [0., 1.]]);
+        assert_eq!(u.transpose(), Matrix::from([[1., 0.], [0., 1.]]));
+
+        let u = Matrix::from([[2., -5., 0.], [4., 3., 7.], [-2., 3., 4.]]);
+        assert_eq!(
+            u.transpose(),
+            Matrix::from([[2., 4., -2.], [-5., 3., 3.], [0., 7., 4.]])
+        );
+
+        let u = Matrix::from([[-2., -8., 4.], [1., -23., 4.], [0., 6., 4.]]);
+        assert_eq!(
+            u.transpose(),
+            Matrix::from([[-2., 1., 0.], [-8., -23., 6.], [4., 4., 4.]])
+        );
+    }
+
+    #[test]
+    fn test_transpose_f32_zero() {
+        let u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        assert_eq!(u.transpose(), Matrix::from([[0., 0.], [0., 0.]]));
+    }
+
+    #[test]
+    fn test_transpose_f32_empty() {
+        let u: Matrix<f32> = Matrix::from([] as [[f32; 0]; 0]);
+        assert_eq!(u.transpose(), Matrix::from([] as [[f32; 0]; 0]));
     }
 }
