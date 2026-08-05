@@ -17,6 +17,10 @@ where
             data: vec![K::default(); size],
         }
     }
+
+    pub fn empty() -> Self {
+        Self { data: Vec::new() }
+    }
 }
 
 // Getters

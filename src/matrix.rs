@@ -3,7 +3,7 @@ use crate::Vector;
 use std::fmt;
 use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, SubAssign};
 
-// Structure
+// Structure //! Clone ?
 #[derive(Debug, PartialEq)]
 pub struct Matrix<K> {
     data: Vec<K>,
@@ -21,6 +21,14 @@ where
             data: vec![K::default(); rows * cols],
             rows,
             cols,
+        }
+    }
+
+    pub fn empty() -> Self {
+        Self {
+            data: Vec::new(),
+            rows: 0,
+            cols: 0,
         }
     }
 }
