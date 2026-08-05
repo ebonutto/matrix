@@ -237,11 +237,7 @@ where
     K: Copy + Default,
 {
     pub fn transpose(&self) -> Matrix<K> {
-        let mut result = Matrix {
-            data: vec![K::default(); self.cols * self.rows],
-            rows: self.cols,
-            cols: self.rows,
-        };
+        let mut result = Matrix::zeros(self.cols, self.rows);
 
         for i in 0..self.rows {
             for j in 0..self.cols {
