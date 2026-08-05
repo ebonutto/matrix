@@ -1,10 +1,10 @@
 use crate::Vector;
 
 use std::fmt;
-use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, SubAssign};
+use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, SubAssign, Div};
 
-// Structure //! Clone ?
-#[derive(Debug, PartialEq)]
+// Structure
+#[derive(Clone, Debug, PartialEq)]
 pub struct Matrix<K> {
     data: Vec<K>,
     rows: usize,
@@ -51,6 +51,10 @@ impl<K> Matrix<K> {
 
     pub fn is_square(&self) -> bool {
         self.rows == self.cols
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.rows == 0 && self.cols == 0
     }
 }
 
@@ -261,14 +265,63 @@ where
     }
 }
 
-impl<K> Matrix<K> {
-    pub fn row_echelon<K>(&self) -> Matrix<K> {
-        let mut result = Matrix::from(self);
-        let mut pivot_row: usize = 0;
-
-        for col in result.cols {
-            
+// Row echelon form
+impl<K> Matrix<K>
+where
+    K: Copy + Default + std::cmp::PartialEq + Div<Output = K>
+    + Mul<Output = K> + SubAssign,
+{
+    fn swap_rows(&mut self, row1: usize, row2: usize) {
+        for col in 0..self.cols {
+            self.data
+                .swap(row1 * self.cols + col, row2 * self.cols + col)
         }
+    }
+
+    pub fn row_echelon(&self) -> Matrix<K> {
+        let mut result = self.clone();
+        let mut pivot_row1: usize = 0;
+
+        for col in 0..result.cols {
+            let mut pivot_row2 = None;
+
+            for row in pivot_row1..result.rows {
+                if result[(row, col)] != K::default() {
+                    pivot_row2 = Some(row);
+                    break;
+                }
+            }
+
+            let Some(pivot_row2) = pivot_row2 else {
+                continue;
+            };
+
+            if pivot_row1 != pivot_row2 {
+                result.swap_rows(pivot_row1, pivot_row2);
+            }
+
+            let pivot = result[(pivot_row1, col)];
+
+            // Normalize
+            for col2 in col..result.cols {
+                result[(pivot_row, col2)] =
+                    result[(pivot_row, col2)] / pivot_value;
+            }
+
+            // elimination
+            for row in (pivot_row + 1)..result.rows {
+                let factor = result[(row, col)];
+
+                for col2 in col..result.cols {
+                    let pivot_element = result[(pivot_row, col2)];
+                    result[(row, col2)] -= factor * pivot_element;
+                }
+            }
+
+            pivot_row += 1;
+        }
+
+        result
     }
 }
 

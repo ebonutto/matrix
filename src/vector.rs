@@ -1,7 +1,7 @@
 use std::fmt;
 use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
-// Structure //! Clone
+// Structure
 #[derive(Debug, PartialEq)]
 pub struct Vector<K> {
     data: Vec<K>,
@@ -29,6 +29,10 @@ impl<K> Vector<K> {
 impl<K> Vector<K> {
     pub fn size(&self) -> usize {
         self.data.len()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.data.len() == 0
     }
 }
 
