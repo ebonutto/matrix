@@ -10,14 +10,16 @@ pub struct Vector<K> {
 // Constructors
 impl<K> Vector<K>
 where
-    K: Default + Copy,
+    K: Clone + Default,
 {
     pub fn zeros(size: usize) -> Self {
         Self {
             data: vec![K::default(); size],
         }
     }
+}
 
+impl<K> Vector<K> {
     pub fn empty() -> Self {
         Self { data: Vec::new() }
     }

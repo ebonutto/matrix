@@ -14,7 +14,7 @@ pub struct Matrix<K> {
 // Constructors
 impl<K> Matrix<K>
 where
-    K: Copy + Default,
+    K: Clone + Default,
 {
     pub fn zeros(rows: usize, cols: usize) -> Self {
         Self {
@@ -23,7 +23,9 @@ where
             cols,
         }
     }
+}
 
+impl<K> Matrix<K> {
     pub fn empty() -> Self {
         Self {
             data: Vec::new(),
