@@ -198,6 +198,7 @@ where
     }
 
     pub fn mul_mat(&self, mat: &Matrix<K>) -> Matrix<K> {
+        //! Change error message
         assert_eq!(
             self.cols,
             mat.rows,
@@ -260,12 +261,16 @@ where
     }
 }
 
-// impl<K> Matrix<K> {
-//     fn row_echelon<K>(&self) -> Matrix<K> {
-//         let mut result = vec![K::default(); self.rows];
+impl<K> Matrix<K> {
+    pub fn row_echelon<K>(&self) -> Matrix<K> {
+        let mut result = Matrix::from(self);
+        let mut pivot_row: usize = 0;
 
-//     }
-// }
+        for col in result.cols {
+            
+        }
+    }
+}
 
 // impl<K> Matrix<K> {
 //     pub fn determinant(&self) -> K {}
