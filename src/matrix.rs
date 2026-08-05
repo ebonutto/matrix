@@ -166,7 +166,7 @@ impl<K> Matrix<K>
 where
     K: Copy + Default + AddAssign + Mul<Output = K>,
 {
-    pub fn mul_vec(&self, vec: &Vector<K>) -> Vector<K> {
+    pub fn mul_vec(&self, vec: &Vector<K>) -> Vector<K> { //! Change error message
         assert_eq!(
             self.cols,
             vec.size(),
@@ -398,6 +398,40 @@ mod tests {
         let u: Matrix<f32> = Matrix::from([] as [[f32; 0]; 0]);
         let v: Vector<f32> = Vector::from([]);
         assert_eq!(u.mul_vec(&v), Vector::from([]));
+    }
+
+    // Multiplication matrix f32
+    #[test]
+    fn test_multiplication_matrix_f32_basic() {
+        let u: Matrix<f32> = Matrix::from([[1., 0.], [0., 1.]]);
+        let v: Matrix<f32> = Matrix::from([[1., 0.], [0., 1.]]);
+        assert_eq!(u.mul_mat(&v), Matrix::from([[1., 0.], [0., 1.]]));
+
+        let u: Matrix<f32> = Matrix::from([[1., 0.], [0., 1.]]);
+        let v: Matrix<f32> = Matrix::from([[2., 1.], [4., 2.]]);
+        assert_eq!(u.mul_mat(&v), Matrix::from([[2., 1.], [4., 2.]]));
+
+        let u: Matrix<f32> = Matrix::from([[3., -5.], [6., 8.]]);
+        let v: Matrix<f32> = Matrix::from([[2., 1.], [4., 2.]]);
+        assert_eq!(u.mul_mat(&v), Matrix::from([[-14., -7.], [44., 22.]]));
+    }
+
+    #[test]
+    fn test_multiplication_matrix_f32_zero() {
+        let u: Matrix<f32> = Matrix::from([[1., 2.], [3., 14.]]);
+        let v: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        assert_eq!(u.mul_mat(&v), Matrix::from([[0., 0.], [0., 0.]]));
+
+        let u: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        let v: Matrix<f32> = Matrix::from([[0., 0.], [0., 0.]]);
+        assert_eq!(u.mul_mat(&v), Matrix::from([[0., 0.], [0., 0.]]));
+    }
+
+    #[test]
+    fn test_multiplication_matrix_f32_empty() {
+        let u: Matrix<f32> = Matrix::from([] as [[f32; 0]; 0]);
+        let v: Matrix<f32> = Matrix::from([] as [[f32; 0]; 0]);
+        assert_eq!(u.mul_mat(&v), Matrix::from([] as [[f32; 0]; 0]));
     }
 
     // Trace f32
