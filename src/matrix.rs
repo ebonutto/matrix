@@ -1,7 +1,8 @@
 use crate::Vector;
 
+use std::cmp::PartialEq;
 use std::fmt;
-use std::ops::{AddAssign, Index, IndexMut, Mul, MulAssign, SubAssign, Div};
+use std::ops::{AddAssign, Div, Index, IndexMut, Mul, MulAssign, SubAssign};
 
 // Structure
 #[derive(Clone, Debug, PartialEq)]
@@ -35,7 +36,7 @@ impl<K> Matrix<K> {
     }
 }
 
-// Getters
+// Accessors
 impl<K> Matrix<K> {
     pub fn rows(&self) -> usize {
         self.rows
@@ -48,7 +49,10 @@ impl<K> Matrix<K> {
     pub fn shape(&self) -> (usize, usize) {
         (self.rows, self.cols)
     }
+}
 
+// Predicates
+impl<K> Matrix<K> {
     pub fn is_square(&self) -> bool {
         self.rows == self.cols
     }
@@ -265,68 +269,125 @@ where
     }
 }
 
-// Row echelon form
+// Reduced row echelon form
 impl<K> Matrix<K>
 where
-    K: Copy + Default + std::cmp::PartialEq + Div<Output = K>
-    + Mul<Output = K> + SubAssign,
+    K: Copy + Default + PartialEq + Div<Output = K> + Mul<Output = K> + SubAssign,
 {
-    fn swap_rows(&mut self, row1: usize, row2: usize) {
-        for col in 0..self.cols {
-            self.data
-                .swap(row1 * self.cols + col, row2 * self.cols + col)
-        }
-    }
-
     pub fn row_echelon(&self) -> Matrix<K> {
         let mut result = self.clone();
-        let mut pivot_row1: usize = 0;
+        let mut pivot_row: usize = 0;
 
         for col in 0..result.cols {
-            let mut pivot_row2 = None;
-
-            for row in pivot_row1..result.rows {
-                if result[(row, col)] != K::default() {
-                    pivot_row2 = Some(row);
-                    break;
-                }
+            if pivot_row >= result.rows {
+                break;
             }
 
-            let Some(pivot_row2) = pivot_row2 else {
+            let Some(found_row) = result.find_pivot(pivot_row, col) else {
                 continue;
             };
 
-            if pivot_row1 != pivot_row2 {
-                result.swap_rows(pivot_row1, pivot_row2);
+            if found_row != pivot_row {
+                result.swap_rows(found_row, pivot_row);
             }
 
-            let pivot = result[(pivot_row1, col)];
+            result.normalize_pivot_row(pivot_row, col);
 
-            // Normalize
-            for col2 in col..result.cols {
-                result[(pivot_row, col2)] =
-                    result[(pivot_row, col2)] / pivot_value;
-            }
-
-            // elimination
-            for row in (pivot_row + 1)..result.rows {
-                let factor = result[(row, col)];
-
-                for col2 in col..result.cols {
-                    let pivot_element = result[(pivot_row, col2)];
-                    result[(row, col2)] -= factor * pivot_element;
-                }
-            }
+            result.eliminate_column(pivot_row, col);
 
             pivot_row += 1;
         }
 
         result
     }
+
+    fn swap_rows(&mut self, row1: usize, row2: usize) {
+        for col in 0..self.cols {
+            self.data
+                .swap(row1 * self.cols + col, row2 * self.cols + col);
+        }
+    }
+
+    fn find_pivot(&self, start_row: usize, col: usize) -> Option<usize> {
+        (start_row..self.rows).find(|&row| self[(row, col)] != K::default())
+    }
+
+    fn normalize_pivot_row(&mut self, pivot_row: usize, start_col: usize) {
+        let pivot = self[(pivot_row, start_col)];
+        for col in start_col..self.cols {
+            self[(pivot_row, col)] = self[(pivot_row, col)] / pivot;
+        }
+    }
+
+    fn eliminate_column(&mut self, pivot_row: usize, start_col: usize) {
+        for row in 0..self.rows {
+            if row == pivot_row {
+                continue;
+            }
+
+            let factor = self[(row, start_col)];
+            if factor != K::default() {
+                for col in start_col..self.cols {
+                    let pivot = self[(pivot_row, col)];
+                    self[(row, col)] -= factor * pivot;
+                }
+            }
+        }
+    }
 }
 
-// impl<K> Matrix<K> {
-//     pub fn determinant(&self) -> K {}
+// impl<K> Matrix<K>
+// where
+//     K: Default
+// {
+//     fn determinant_rec() -> K {
+//         if self.rows == 2 {
+//             return self[(0, 0)] *self[(1, 1)] - self[(0, 1)] * self[(1, 0)];
+//         }
+
+//         let mut sign: char = 1;
+//         let mut result: K::default();
+
+//         for col in 0..cols {
+//             let mut submatrix = Matrix::zeros(self.rows - 1, self.cols -1);
+
+//             for i in 1..self.rows {
+//                 for (j, k) in 0..self.cols {
+//                     if j == col {
+//                         k++;
+//                     }
+
+//                     submatrix[(i, j)] = self[(i, k)];
+//                 }
+//             }
+
+//             result += sign * self[(0, col)] * submatrix.determinant();
+//             sign *= -1;
+//         }
+
+//         result
+//     }
+
+//     pub fn determinant(&self) -> K {
+//         assert!(
+//             self.is_square(),
+//             "Matrix::determinant: undefined for non-square matrix ({:?})",
+//             self.shape()
+//         );
+//         assert!(
+//             self.rows <= 4,
+//             "Matrix::determinant: only supported for dimensions <= 4 (got {})",
+//             self.rows
+//         );
+
+//         match self.rows {
+//             0 => K::default(),
+//             1 => self[(0, 0)],
+//             2 => self[(self.determinant_2x2())],
+//             3 => self[(self.determinant_2x2())],
+//             4 => self[(self.determinant_2x2())],
+//         }
+//     }
 // }
 
 #[cfg(test)]
@@ -570,5 +631,27 @@ mod tests {
     fn test_transpose_f32_empty() {
         let u: Matrix<f32> = Matrix::from([] as [[f32; 0]; 0]);
         assert_eq!(u.transpose(), Matrix::from([] as [[f32; 0]; 0]));
+    }
+
+    #[test]
+    fn test_reduced_row_echelon_form_f32_basic() {
+        let u: Matrix<f32> = Matrix::from([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
+        assert_eq!(u.row_echelon(), Matrix::from([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]));
+
+        let u = Matrix::from([[1., 2.], [3., 4.]]);
+        assert_eq!(u.row_echelon(), Matrix::from([[1., 0.], [0., 1.]]));
+
+        let u = Matrix::from([[1., 2.], [2., 4.]]);
+        assert_eq!(u.row_echelon(), Matrix::from([[1., 2.], [0., 0.]]));
+
+        let u = Matrix::from([
+            [8., 5., -2., 4., 28.],
+            [4., 2.5, 20., 4., -4.],
+            [8., 5., 1., 4., 17.],
+        ]);
+        println!("{}", u.row_echelon());
+        // [1.0, 0.625, 0.0, 0.0, -12.1666667]
+        // [0.0, 0.0, 1.0, 0.0, -3.6666667]
+        // [0.0, 0.0, 0.0, 1.0, 29.5 ]
     }
 }
