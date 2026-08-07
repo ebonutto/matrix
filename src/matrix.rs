@@ -123,10 +123,8 @@ where
             v.shape()
         );
 
-        for row in 0..self.rows {
-            for col in 0..self.cols {
-                self[(row, col)] += v[(row, col)];
-            }
+        for (a, b) in self.data.iter_mut().zip(v.data.iter()) {
+            *a += *b;
         }
     }
 }
@@ -145,10 +143,8 @@ where
             v.shape()
         );
 
-        for row in 0..self.rows {
-            for col in 0..self.cols {
-                self[(row, col)] -= v[(row, col)];
-            }
+        for (a, b) in self.data.iter_mut().zip(v.data.iter()) {
+            *a -= *b;
         }
     }
 }
@@ -159,10 +155,8 @@ where
     K: Copy + MulAssign,
 {
     pub fn scl(&mut self, a: K) {
-        for row in 0..self.rows {
-            for col in 0..self.cols {
-                self[(row, col)] *= a;
-            }
+        for x in self.data.iter_mut() {
+            *x *= a;
         }
     }
 }
