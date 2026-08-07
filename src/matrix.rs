@@ -569,7 +569,10 @@ mod tests {
     #[test]
     fn test_reduced_row_echelon_form_f32_basic() {
         let u: Matrix<f32> = Matrix::from([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]);
-        assert_eq!(u.row_echelon(), Matrix::from([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]]));
+        assert_eq!(
+            u.row_echelon(),
+            Matrix::from([[1., 0., 0.], [0., 1., 0.], [0., 0., 1.]])
+        );
 
         let u = Matrix::from([[1., 2.], [3., 4.]]);
         assert_eq!(u.row_echelon(), Matrix::from([[1., 0.], [0., 1.]]));
