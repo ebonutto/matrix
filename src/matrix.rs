@@ -80,7 +80,7 @@ impl<K: fmt::Display> fmt::Display for Matrix<K> {
             write!(f, "[")?;
 
             for col in 0..self.cols {
-                write!(f, "{}", self.data[row * self.cols + col])?;
+                write!(f, "{}", self[(row, col)])?;
 
                 if col + 1 < self.cols {
                     write!(f, ", ")?;
@@ -103,9 +103,10 @@ impl<K> Index<(usize, usize)> for Matrix<K> {
 
         debug_assert!(
             i < self.data.len(),
-            "Matrix::index: index {} out of bounds (size {})",
-            i,
-            self.data.len()
+            "Matrix::index: index ({}, {}) out of bounds (shape {:?})",
+            row,
+            col,
+            self.shape()
         );
 
         &self.data[i]
@@ -118,9 +119,10 @@ impl<K> IndexMut<(usize, usize)> for Matrix<K> {
 
         debug_assert!(
             i < self.data.len(),
-            "Matrix::index_mut: index {} out of bounds (size {})",
-            i,
-            self.data.len()
+            "Matrix::index_mut: index ({}, {}) out of bounds (shape {:?})",
+            row,
+            col,
+            self.shape()
         );
 
         &mut self.data[i]
@@ -141,8 +143,10 @@ where
             v.shape()
         );
 
-        for (a, b) in self.data.iter_mut().zip(v.data.iter()) {
-            *a += *b;
+        for row in 0..self.rows {
+            for col in 0..self.cols {
+                self[(row, col)] += v[(row, col)];
+            }
         }
     }
 }
@@ -161,8 +165,10 @@ where
             v.shape()
         );
 
-        for (a, b) in self.data.iter_mut().zip(v.data.iter()) {
-            *a -= *b;
+        for row in 0..self.rows {
+            for col in 0..self.cols {
+                self[(row, col)] -= v[(row, col)];
+            }
         }
     }
 }
@@ -173,8 +179,10 @@ where
     K: Copy + MulAssign,
 {
     pub fn scl(&mut self, a: K) {
-        for x in self.data.iter_mut() {
-            *x *= a;
+        for row in 0..self.rows {
+            for col in 0..self.cols {
+                self[(row, col)] *= a;
+            }
         }
     }
 }
@@ -196,9 +204,9 @@ where
 
         let mut result = Vector::zeros(self.rows);
 
-        for i in 0..self.rows {
-            for j in 0..self.cols {
-                result[i] += self[(i, j)] * vec[j];
+        for row in 0..self.rows {
+            for col in 0..self.cols {
+                result[row] += self[(row, col)] * vec[col];
             }
         }
 
@@ -217,10 +225,10 @@ where
 
         let mut result = Matrix::zeros(self.rows, mat.cols);
 
-        for i in 0..self.rows {
-            for j in 0..mat.cols {
+        for row in 0..self.rows {
+            for col in 0..mat.cols {
                 for k in 0..self.cols {
-                    result[(i, j)] += self[(i, k)] * mat[(k, j)];
+                    result[(row, col)] += self[(row, k)] * mat[(k, col)];
                 }
             }
         }
@@ -243,8 +251,8 @@ where
 
         let mut sum = K::default();
 
-        for i in 0..self.rows {
-            sum += self[(i, i)];
+        for row in 0..self.rows {
+            sum += self[(row, row)];
         }
 
         sum
@@ -259,9 +267,9 @@ where
     pub fn transpose(&self) -> Matrix<K> {
         let mut result = Matrix::zeros(self.cols, self.rows);
 
-        for i in 0..self.rows {
-            for j in 0..self.cols {
-                result[(j, i)] = self[(i, j)];
+        for row in 0..self.rows {
+            for col in 0..self.cols {
+                result[(col, row)] = self[(row, col)];
             }
         }
 
@@ -292,7 +300,6 @@ where
             }
 
             result.normalize_pivot_row(pivot_row, col);
-
             result.eliminate_column(pivot_row, col);
 
             pivot_row += 1;
@@ -335,60 +342,6 @@ where
         }
     }
 }
-
-// impl<K> Matrix<K>
-// where
-//     K: Default
-// {
-//     fn determinant_rec() -> K {
-//         if self.rows == 2 {
-//             return self[(0, 0)] *self[(1, 1)] - self[(0, 1)] * self[(1, 0)];
-//         }
-
-//         let mut sign: char = 1;
-//         let mut result: K::default();
-
-//         for col in 0..cols {
-//             let mut submatrix = Matrix::zeros(self.rows - 1, self.cols -1);
-
-//             for i in 1..self.rows {
-//                 for (j, k) in 0..self.cols {
-//                     if j == col {
-//                         k++;
-//                     }
-
-//                     submatrix[(i, j)] = self[(i, k)];
-//                 }
-//             }
-
-//             result += sign * self[(0, col)] * submatrix.determinant();
-//             sign *= -1;
-//         }
-
-//         result
-//     }
-
-//     pub fn determinant(&self) -> K {
-//         assert!(
-//             self.is_square(),
-//             "Matrix::determinant: undefined for non-square matrix ({:?})",
-//             self.shape()
-//         );
-//         assert!(
-//             self.rows <= 4,
-//             "Matrix::determinant: only supported for dimensions <= 4 (got {})",
-//             self.rows
-//         );
-
-//         match self.rows {
-//             0 => K::default(),
-//             1 => self[(0, 0)],
-//             2 => self[(self.determinant_2x2())],
-//             3 => self[(self.determinant_2x2())],
-//             4 => self[(self.determinant_2x2())],
-//         }
-//     }
-// }
 
 #[cfg(test)]
 mod tests {
