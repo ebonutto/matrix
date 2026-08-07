@@ -99,33 +99,13 @@ impl<K> Index<(usize, usize)> for Matrix<K> {
     type Output = K;
 
     fn index(&self, (row, col): (usize, usize)) -> &Self::Output {
-        let i: usize = row * self.cols + col;
-
-        debug_assert!(
-            i < self.data.len(),
-            "Matrix::index: index ({}, {}) out of bounds (shape {:?})",
-            row,
-            col,
-            self.shape()
-        );
-
-        &self.data[i]
+        &self.data[row * self.cols + col]
     }
 }
 
 impl<K> IndexMut<(usize, usize)> for Matrix<K> {
     fn index_mut(&mut self, (row, col): (usize, usize)) -> &mut Self::Output {
-        let i: usize = row * self.cols + col;
-
-        debug_assert!(
-            i < self.data.len(),
-            "Matrix::index_mut: index ({}, {}) out of bounds (shape {:?})",
-            row,
-            col,
-            self.shape()
-        );
-
-        &mut self.data[i]
+        &mut self.data[row * self.cols + col]
     }
 }
 
