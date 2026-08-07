@@ -25,12 +25,15 @@ impl<K> Vector<K> {
     }
 }
 
-// Getters
+// Accessors
 impl<K> Vector<K> {
     pub fn size(&self) -> usize {
         self.data.len()
     }
+}
 
+// Predicates
+impl<K> Vector<K> {
     pub fn is_empty(&self) -> bool {
         self.data.len() == 0
     }
@@ -56,26 +59,12 @@ impl<K> Index<usize> for Vector<K> {
     type Output = K;
 
     fn index(&self, i: usize) -> &Self::Output {
-        debug_assert!(
-            i < self.data.len(),
-            "Vector::index: index {} out of bounds (size {})",
-            i,
-            self.data.len()
-        );
-
         &self.data[i]
     }
 }
 
 impl<K> IndexMut<usize> for Vector<K> {
     fn index_mut(&mut self, i: usize) -> &mut Self::Output {
-        debug_assert!(
-            i < self.data.len(),
-            "Vector::index_mut: index {} out of bounds (size {})",
-            i,
-            self.data.len()
-        );
-
         &mut self.data[i]
     }
 }

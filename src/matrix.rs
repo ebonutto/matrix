@@ -340,7 +340,7 @@ where
             1 => self[(0, 0)],
             2 => self.determinant_2x2(),
             3 => self.determinant_3x3(),
-            4 => self.determinant_4x4(),
+            // 4 => self.determinant_4x4(),
             _ => unreachable!(),
         }
     }
