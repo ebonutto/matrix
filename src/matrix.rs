@@ -2,7 +2,7 @@ use crate::Vector;
 
 use std::cmp::PartialEq;
 use std::fmt;
-use std::ops::{AddAssign, Div, Index, IndexMut, Mul, MulAssign, SubAssign};
+use std::ops::{Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Sub, SubAssign};
 
 // Structure
 #[derive(Clone, Debug, PartialEq)]
@@ -320,6 +320,39 @@ where
                 }
             }
         }
+    }
+}
+
+// Determinant
+impl<K> Matrix<K>
+where
+    K: Copy + Default + Sub<Output = K> + Mul<Output = K> + Add<Output = K>,
+{
+    pub fn determinant(&self) -> K {
+        assert!(
+            self.is_square(),
+            "Matrix::determinant: undefined for non-square matrix ({:?})",
+            self.shape()
+        );
+
+        match self.rows {
+            0 => K::default(),
+            1 => self[(0, 0)],
+            2 => self.determinant_2x2(),
+            3 => self.determinant_3x3(),
+            4 => self.determinant_4x4(),
+            _ => unreachable!(),
+        }
+    }
+
+    fn determinant_2x2(&self) -> K {
+        self[(0, 0)] * self[(1, 1)] - self[(0, 1)] * self[(1, 0)]
+    }
+
+    fn determinant_3x3(&self) -> K {
+        self[(0, 0)] * (self[(1, 1)] * self[(2, 2)] - self[(1, 2)] * self[(2, 1)])
+            - self[(0, 1)] * (self[(1, 0)] * self[(2, 2)] - self[(1, 2)] * self[(2, 0)])
+            + self[(0, 2)] * (self[(1, 0)] * self[(2, 1)] - self[(1, 1)] * self[(2, 0)])
     }
 }
 
